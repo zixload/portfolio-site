@@ -1,0 +1,31 @@
+name: Weekly streak report
+
+on:
+  schedule:
+    # Sunday 20h Paris time (CEST = UTC+2)
+    - cron: '0 18 * * 0'
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute weekly streak
+        id: streak
+        run: |
+          SINCE=$(date -u -d "7 days ago" +%Y-%m-%d)
+          COUNT=$(git log --since="$SINCE" --pretty=format:"%ae %ad" --date=short | grep -v "github-actions\[bot\]" | awk '{print $2}' | sort -u | wc -l)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Send Discord streak report
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          MSG="Streak hebdo \`portfolio-site\` : ${{ steps.streak.outputs.count }}/7 jours"
+          curl -s -H "Content-Type: application/json" \
+            -d "$(jq -n --arg content "$MSG" '{content: $content}')" \
+            "$DISCORD_WEBHOOK_URL"
