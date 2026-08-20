@@ -25,7 +25,7 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          MSG="Streak hebdo \`portfolio-site\` : ${{ steps.streak.outputs.count }}/7 jours"
+          MSG="<@277728026790199296> Streak hebdo \`portfolio-site\` : ${{ steps.streak.outputs.count }}/7 jours"
           curl -s -H "Content-Type: application/json" \
             -d "$(jq -n --arg content "$MSG" '{content: $content}')" \
             "$DISCORD_WEBHOOK_URL"
