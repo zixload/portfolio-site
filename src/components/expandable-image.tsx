@@ -9,12 +9,14 @@ export function ExpandableImage({
   width,
   height,
   className,
+  hoverClassName,
 }: {
   src: string;
   alt: string;
   width: number;
   height: number;
   className?: string;
+  hoverClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -40,7 +42,7 @@ export function ExpandableImage({
           alt={alt}
           width={width}
           height={height}
-          className="h-full w-full object-cover transition-opacity hover:opacity-80"
+          className={`h-full w-full object-cover transition-[opacity,transform] duration-200 hover:opacity-80 ${hoverClassName ?? ""}`}
         />
       </button>
 

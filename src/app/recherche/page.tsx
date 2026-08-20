@@ -7,7 +7,10 @@ export default function ResearchPage() {
   const c = useContent();
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-10">
-      <div className="flex flex-col gap-3">
+      <div
+        className="flex flex-col gap-3"
+        style={{ animation: "fadeUp 0.7s ease-out 90ms both" }}
+      >
         <h1 className="text-xl font-semibold tracking-tight">
           {c.pages.recherche.title}
         </h1>
@@ -15,7 +18,9 @@ export default function ResearchPage() {
           {c.pages.recherche.description}
         </p>
       </div>
-      <EntryList entries={c.research} />
+      <div style={{ animation: "fadeUp 0.7s ease-out 180ms both" }}>
+        <EntryList entries={c.research} />
+      </div>
     </div>
   );
 }

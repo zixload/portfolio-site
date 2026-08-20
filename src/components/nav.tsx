@@ -8,7 +8,10 @@ export function Nav() {
   const { locale, setLocale } = useLocale();
 
   return (
-    <header className="w-full">
+    <header
+      className="w-full"
+      style={{ animation: "fadeUp 0.7s ease-out 0ms both" }}
+    >
       <nav className="mx-auto flex max-w-5xl items-center gap-5 px-6 pt-10 text-sm text-zinc-500 dark:text-zinc-400 sm:px-0">
         {nav.map((item) => (
           <Link

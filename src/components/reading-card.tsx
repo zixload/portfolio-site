@@ -16,6 +16,7 @@ export function ReadingCard() {
           width={110}
           height={150}
           className="h-[150px] w-[110px] rounded-sm shadow-sm"
+          hoverClassName="hover:scale-[1.06] hover:-rotate-1"
         />
         <div className="flex flex-col gap-1">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -46,6 +47,7 @@ export function ReadingCard() {
           width={96}
           height={130}
           className="mx-auto h-[130px] w-24 rounded-sm sm:mx-0"
+          hoverClassName="hover:scale-[1.14] hover:rotate-1"
         />
       </div>
     </div>

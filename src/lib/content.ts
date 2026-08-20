@@ -22,6 +22,7 @@ export type Entry = {
   date: string; // ISO
   description: string;
   href?: string; // lien externe optionnel (PDF, repo, etc.)
+  post?: boolean; // true = page interne /blog/{slug} (Markdown), rendu via src/posts/{slug}.md
 };
 
 // Images partagées entre les deux langues.
@@ -135,6 +136,14 @@ export const content: Record<Locale, LocaleContent> = {
       },
     ],
     journal: [
+      {
+        slug: "putty-ecdsa-nonce-bias",
+        title: "PoC — CVE-2024-31497 : biais de nonce ECDSA dans PuTTY",
+        date: "2026-08-20",
+        description:
+          "Comment 9 bits de nonce biaisés dans PuTTY < 0.81 permettent de retrouver une clé privée ECDSA P-521 via le Hidden Number Problem et une réduction de réseau.",
+        post: true,
+      },
       {
         slug: "sabr-heston-spx-vix",
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
@@ -267,6 +276,14 @@ export const content: Record<Locale, LocaleContent> = {
     ],
     journal: [
       {
+        slug: "putty-ecdsa-nonce-bias",
+        title: "PoC — CVE-2024-31497: ECDSA Nonce Bias in PuTTY",
+        date: "2026-08-20",
+        description:
+          "How 9 biased nonce bits in PuTTY < 0.81 let you recover an ECDSA P-521 private key via the Hidden Number Problem and lattice reduction.",
+        post: true,
+      },
+      {
         slug: "sabr-heston-spx-vix",
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
         date: "2026-04-10",
@@ -324,3 +341,11 @@ export const content: Record<Locale, LocaleContent> = {
     notesHeading: "Notes",
   },
 };
+
+// Retrouve la date (et le titre) d'un article Markdown à partir de son slug —
+// les articles vivent dans src/posts/, mais leurs métadonnées restent ici.
+export function findEntry(slug: string): Entry | undefined {
+  return [...content.fr.research, ...content.fr.journal].find(
+    (entry) => entry.slug === slug
+  );
+}
