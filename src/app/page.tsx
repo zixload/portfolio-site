@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BioTabs } from "@/components/bio-tabs";
 import { ExpandableImage } from "@/components/expandable-image";
 import { GithubIcon } from "@/components/github-icon";
+import { PhotoStack } from "@/components/photo-stack";
 import { ReadingCard } from "@/components/reading-card";
 import { formatDate } from "@/lib/format";
 import { links, media, site } from "@/lib/content";
@@ -68,6 +69,17 @@ export default function Home() {
                     <p className="flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
                       {c.combatSportsBlurb}
                     </p>
+                  </div>
+                  <div className="flex gap-4">
+                    <p className="flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
+                      {c.lolBlurb}
+                    </p>
+                    <PhotoStack
+                      images={media.lolScreens.map((src, i) => ({
+                        src,
+                        alt: `Rank up screenshot ${i + 1}`,
+                      }))}
+                    />
                   </div>
                 </>
               }

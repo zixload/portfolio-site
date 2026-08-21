@@ -9,6 +9,8 @@ export function HeroVideo() {
       loop
       muted
       playsInline
+      disablePictureInPicture
+      disableRemotePlayback
     />
   );
 }

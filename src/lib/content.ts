@@ -30,6 +30,13 @@ export const media = {
   currentlyReadingCover: "/media/shadow-slave-cover.jpg",
   currentlyReadingIllustration: "/media/shadow-slave-illustration.jpg",
   combatSportsPhoto: "/media/photo_box.jpg",
+  lolScreens: [
+    "/media/lol-challenger-flex.png",
+    "/media/lol-master-1.png",
+    "/media/lol-master-2.png",
+    "/media/lol-master-3.png",
+    "/media/lol-master-4.png",
+  ],
 };
 
 type LocaleContent = {
@@ -38,6 +45,7 @@ type LocaleContent = {
   bioLong: string[];
   combatSportsBlurb: string;
   combatSportsCaption: string;
+  lolBlurb: string;
   currentlyReading: {
     title: string;
     author: string;
@@ -77,6 +85,8 @@ export const content: Record<Locale, LocaleContent> = {
     ],
     combatSportsBlurb:
       "J'ai pratiqué la boxe thaï pendant pas mal d'années, et j'ai adoré le côté stratégique et technique. Je regarde aussi beaucoup de MMA, et j'ai hâte que Salahdine Parnasse devienne champion, parce que oui, il le sera à l'UFC.",
+    lolBlurb:
+      "Sinon je joue à League of Legends — Master en solo/duo, et même passé Challenger en Flex 5v5 une fois. Pas mon activité principale, mais toujours satisfaisant de grind un peu de ranked.",
     combatSportsCaption: "Avec Salahdine Parnasse",
     currentlyReading: {
       title: "Shadow Slave",
@@ -218,6 +228,8 @@ export const content: Record<Locale, LocaleContent> = {
     combatSportsBlurb:
       "I practiced Muay Thai for quite a few years, and loved the strategic and technical side of it. I also watch a lot of MMA — and I can't wait for Salahdine Parnasse to become champion, because yes, he will be UFC champion.",
     combatSportsCaption: "With Salahdine Parnasse",
+    lolBlurb:
+      "I also play League of Legends — Master in solo/duo queue, and even hit Challenger in Flex 5v5 once. Not my main thing, but grinding some ranked is always satisfying.",
     currentlyReading: {
       title: "Shadow Slave",
       author: "Guiltythree",

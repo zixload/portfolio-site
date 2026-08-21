@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/markdown";
 import { findEntry } from "@/lib/content";
@@ -28,15 +27,8 @@ export default async function BlogPostPage({
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
-      <Link
-        href="/journal"
-        className="w-fit text-sm text-zinc-400 underline decoration-zinc-300 hover:decoration-[var(--accent)] dark:text-zinc-500 dark:decoration-zinc-700"
-      >
-        ← Journal
-      </Link>
-
       {entry && (
-        <div className="-mb-4 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
           <Image
             src="/icon.png"
             alt="zixload"
