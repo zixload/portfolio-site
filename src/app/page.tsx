@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { BioTabs } from "@/components/bio-tabs";
 import { ExpandableImage } from "@/components/expandable-image";
 import { GithubIcon } from "@/components/github-icon";
 import { PhotoStack } from "@/components/photo-stack";
+import { PlatformBadge } from "@/components/platform-badge";
 import { ReadingCard } from "@/components/reading-card";
 import { formatDate } from "@/lib/format";
 import { links, media, site } from "@/lib/content";
@@ -119,7 +121,7 @@ export default function Home() {
           <div className="flex flex-col">
             {recent.map((entry) => {
               const rowClassName =
-                "group flex items-baseline justify-between gap-6 border-t border-zinc-200 py-3 first:border-t-0 dark:border-zinc-800";
+                "group flex flex-1 items-baseline justify-between gap-6";
               const rowContent = (
                 <>
                   <span className="text-zinc-800 group-hover:text-[var(--accent)] dark:text-zinc-200">
@@ -133,21 +135,16 @@ export default function Home() {
                   </time>
                 </>
               );
+              let link: ReactNode;
               if (entry.post) {
-                return (
-                  <Link
-                    key={entry.slug}
-                    href={`/blog/${entry.slug}`}
-                    className={rowClassName}
-                  >
+                link = (
+                  <Link href={`/blog/${entry.slug}`} className={rowClassName}>
                     {rowContent}
                   </Link>
                 );
-              }
-              if (entry.href) {
-                return (
+              } else if (entry.href) {
+                link = (
                   <a
-                    key={entry.slug}
                     href={entry.href}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -156,10 +153,18 @@ export default function Home() {
                     {rowContent}
                   </a>
                 );
+              } else {
+                link = <div className={rowClassName}>{rowContent}</div>;
               }
               return (
-                <div key={entry.slug} className={rowClassName}>
-                  {rowContent}
+                <div
+                  key={entry.slug}
+                  className="flex items-baseline gap-2 border-t border-zinc-200 py-3 first:border-t-0 dark:border-zinc-800"
+                >
+                  {link}
+                  {entry.platform && (
+                    <PlatformBadge platform={entry.platform} />
+                  )}
                 </div>
               );
             })}

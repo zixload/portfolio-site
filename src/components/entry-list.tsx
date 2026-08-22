@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Entry } from "@/lib/content";
 import { formatDate } from "@/lib/format";
+import { PlatformBadge } from "@/components/platform-badge";
 import { useLocale } from "@/lib/locale-context";
 
 function EntryBody({ entry, locale }: { entry: Entry; locale: "fr" | "en" }) {
@@ -27,7 +28,7 @@ function EntryBody({ entry, locale }: { entry: Entry; locale: "fr" | "en" }) {
 }
 
 const wrapperClassName =
-  "group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4";
+  "group flex flex-1 flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4";
 
 export function EntryList({ entries }: { entries: Entry[] }) {
   const { locale } = useLocale();
@@ -35,7 +36,7 @@ export function EntryList({ entries }: { entries: Entry[] }) {
   return (
     <ul className="flex flex-col gap-6">
       {sorted.map((entry) => (
-        <li key={entry.slug}>
+        <li key={entry.slug} className="flex items-baseline gap-2">
           {entry.post ? (
             <Link href={`/blog/${entry.slug}`} className={wrapperClassName}>
               <EntryBody entry={entry} locale={locale} />
@@ -54,6 +55,7 @@ export function EntryList({ entries }: { entries: Entry[] }) {
               <EntryBody entry={entry} locale={locale} />
             </div>
           )}
+          {entry.platform && <PlatformBadge platform={entry.platform} />}
         </li>
       ))}
     </ul>

@@ -5,7 +5,7 @@
 export type Locale = "fr" | "en";
 
 export const site = {
-  name: "lucaslv",
+  name: "zix",
   handle: "@luca",
   email: "luca.silva.r456@gmail.com",
   location: "Paris",
@@ -13,8 +13,47 @@ export const site = {
 
 export const links = [
   { label: "GitHub", href: "https://github.com/zixload" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/luca-silva-lkdn/" },
 ];
+
+export type PlatformKey = "htb" | "thm" | "rootme";
+
+// Logos cliquables (sans fond ni bordure) affichés à côté des entrées liées à
+// une plateforme de CTF/pentest — pointent vers le profil public.
+export const platforms: Record<
+  PlatformKey,
+  {
+    label: string;
+    href: string;
+    logo: string;
+    width: number;
+    height: number;
+    scale?: number; // ajustement visuel relatif entre logos de tailles natives différentes
+  }
+> = {
+  htb: {
+    label: "htb",
+    href: "https://profile.hackthebox.com/profile/019d8bcc-0ba4-7334-a9f5-504b43d4749d",
+    logo: "/media/icons/htb-logo.png",
+    width: 280,
+    height: 280,
+  },
+  thm: {
+    label: "thm",
+    href: "https://tryhackme.com/p/zixload",
+    logo: "/media/icons/thm-logo.png",
+    width: 1200,
+    height: 675,
+    scale: 1.35,
+  },
+  rootme: {
+    label: "rootme",
+    href: "https://www.root-me.org/zixload",
+    logo: "/media/icons/rootme-logo.png",
+    width: 24,
+    height: 24,
+    scale: 0.62,
+  },
+};
 
 export type Entry = {
   slug: string;
@@ -23,13 +62,14 @@ export type Entry = {
   description: string;
   href?: string; // lien externe optionnel (PDF, repo, etc.)
   post?: boolean; // true = page interne /blog/{slug} (Markdown), rendu via src/posts/{slug}.md
+  platform?: PlatformKey; // badge cliquable vers le profil HTB/THM/Root-Me
 };
 
 // Images partagées entre les deux langues.
 export const media = {
   currentlyReadingCover: "/media/shadow-slave-cover.jpg",
   currentlyReadingIllustration: "/media/shadow-slave-illustration.jpg",
-  combatSportsPhoto: "/media/photo_box.jpg",
+  combatSportsPhoto: "/media/photo_box.png",
   lolScreens: [
     "/media/lol-challenger-flex.png",
     "/media/lol-master-1.png",
@@ -124,8 +164,7 @@ export const content: Record<Locale, LocaleContent> = {
           "Quel rôle jouent respectivement les prévisions de volatilité et de corrélation dans l'efficacité des stratégies d'allocation minimum-variance ?",
         date: "2026-08-14",
         description:
-          "Mémoire M2 — Gestion des Risques et des Actifs (Paris-Saclay, dir. Pierre Clauss) : grille factorielle croisant deux modèles de variance (empirique, GARCH) et trois modèles de corrélation (empirique, shrinkage Ledoit-Wolf, DCC), backtestée sur 281 actions américaines (2005–2025). Le shrinkage de la corrélation réduit systématiquement le risque réalisé du portefeuille minimum-variance ; le GARCH le détériore ; le DCC n'apporte de gain robuste dans aucune configuration.",
-        href: "/papers/memoire-m2-minimum-variance.pdf",
+          "Mémoire M2 — Gestion des Risques et des Actifs (Paris-Saclay) : grille factorielle croisant deux modèles de variance (empirique, GARCH) et trois modèles de corrélation (empirique, shrinkage Ledoit-Wolf, DCC), backtestée sur 281 actions américaines (2005–2025). Le shrinkage de la corrélation réduit systématiquement le risque réalisé du portefeuille minimum-variance ; le GARCH le détériore ; le DCC n'apporte de gain robuste dans aucune configuration.",
       },
       {
         slug: "memoire-m1-chocs-geopolitiques",
@@ -133,16 +172,14 @@ export const content: Record<Locale, LocaleContent> = {
           "Réactions différenciées des marchés financiers aux chocs géopolitiques",
         date: "2025-08-01",
         description:
-          "Mémoire M1 — Gestion des Risques et des Actifs (Paris-Saclay, dir. Nada Mselmi) : l'or, le pétrole (WTI) et les indices boursiers (S&P 500, MSCI Asie) face aux chocs géopolitiques 2017–2023, via l'indice GPR (Caldara-Iacoviello) et des modèles VAR / DCC-GARCH. L'or confirme son rôle de valeur refuge ; le pétrole réagit selon la nature du choc.",
-        href: "/papers/memoire-m1-chocs-geopolitiques.pdf",
+          "Mémoire M1 — Gestion des Risques et des Actifs (Paris-Saclay) : l'or, le pétrole (WTI) et les indices boursiers (S&P 500, MSCI Asie) face aux chocs géopolitiques 2017–2023, via l'indice GPR (Caldara-Iacoviello) et des modèles VAR / DCC-GARCH. L'or confirme son rôle de valeur refuge ; le pétrole réagit selon la nature du choc.",
       },
       {
         slug: "memoire-m1-finance-inegalites",
         title: "Finance et inégalité de revenu : une approche moderne",
         date: "2024-05-01",
         description:
-          "Mémoire M1 — Corporate Finance (IAE Bordeaux, dir. Jessica Fouilloux Thomasset) : 136 pays, 1980–2021 — le développement financier suit une relation en U inversé avec les inégalités de revenu (indice FD du FMI), seuil de retournement autour de 0,49. Confirme l'hypothèse de Greenwood et Jovanic (1990).",
-        href: "/papers/memoire-m1-finance-inegalites.pdf",
+          "Mémoire M1 — Corporate Finance (IAE Bordeaux) : 136 pays, 1980–2021 — le développement financier suit une relation en U inversé avec les inégalités de revenu (indice FD du FMI), seuil de retournement autour de 0,49. Confirme l'hypothèse de Greenwood et Jovanic (1990).",
       },
     ],
     journal: [
@@ -159,40 +196,35 @@ export const content: Record<Locale, LocaleContent> = {
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
         date: "2026-04-10",
         description:
-          "Avec Inès Chakib, Cyril Zaki et Gabriel Lopez (ENSIIE, prof. Sergio Pulido) : comparaison SABR vs Heston sur options SPX et VIX, en calibration standard et jointe. SABR domine sur SPX (RMSE 0,43 pt) mais échoue sur VIX (117 pts) ; la version jointe corrige le VIX (14,7 pts) au prix du SPX (0,89 pt). Heston joint offre le meilleur compromis global. Régularité de Hölder empirique proche de 0,5 pour tous les modèles, confirmant une dynamique brownienne standard.",
-        href: "/papers/sabr-heston-spx-vix.pdf",
+          "Projet de groupe (ENSIIE) : comparaison SABR vs Heston sur options SPX et VIX, en calibration standard et jointe. SABR domine sur SPX (RMSE 0,43 pt) mais échoue sur VIX (117 pts) ; la version jointe corrige le VIX (14,7 pts) au prix du SPX (0,89 pt). Heston joint offre le meilleur compromis global. Régularité de Hölder empirique proche de 0,5 pour tous les modèles, confirmant une dynamique brownienne standard.",
       },
       {
         slug: "esg-financial-cycles",
         title: "ESG, Financial Cycles and Extreme Risk",
         date: "2025-12-11",
         description:
-          "Avec Gabriel Lopez et Cyril Zaki : les portefeuilles green ont-ils vraiment un profil de risque différent des brown ? RiskMetrics revisité (GARCH, distribution de Student) pour la VaR et l'Expected Shortfall, copules pour la dépendance en période de crise, filtre de Kalman pour isoler les cycles financiers sectoriels.",
-        href: "/papers/esg-financial-cycles.pdf",
+          "Projet de groupe : les portefeuilles green ont-ils vraiment un profil de risque différent des brown ? RiskMetrics revisité (GARCH, distribution de Student) pour la VaR et l'Expected Shortfall, copules pour la dépendance en période de crise, filtre de Kalman pour isoler les cycles financiers sectoriels.",
       },
       {
         slug: "asset-management-group-project",
         title: "Robust GMV, Machine Learning Views & Portfolio Insurance",
         date: "2025-12-17",
         description:
-          "Avec Gabriel Lopez et Cyril Zaki : portefeuille à variance minimale robuste (Ledoit-Wolf), allocation dynamique avec vues Machine Learning (XGBoost + Black-Litterman), stratégies d'assurance de portefeuille (OBPI vs CPPI, simulations Monte Carlo).",
-        href: "/papers/asset-management-group-project.pdf",
+          "Projet de groupe : portefeuille à variance minimale robuste (Ledoit-Wolf), allocation dynamique avec vues Machine Learning (XGBoost + Black-Litterman), stratégies d'assurance de portefeuille (OBPI vs CPPI, simulations Monte Carlo).",
       },
       {
         slug: "econometrie-cac40",
         title: "Économétrie du CAC 40 — CISS, VIX, HICP",
         date: "2025-01-15",
         description:
-          "Avec Gabriel Lopez et Lonny Le Dez : modélisation des fluctuations du CAC 40 via le CISS (stress systémique), le VIX et l'inflation (HICP), avec tendances Google en variables comportementales. Relation en U inversé du VIX, seuil critique ≈ 23,3.",
-        href: "/papers/econometrie-cac40.pdf",
+          "Projet de groupe : modélisation des fluctuations du CAC 40 via le CISS (stress systémique), le VIX et l'inflation (HICP), avec tendances Google en variables comportementales. Relation en U inversé du VIX, seuil critique ≈ 23,3.",
       },
       {
         slug: "econometrie-crises-financieres",
         title: "Les facteurs déclencheurs des crises financières",
         date: "2025-01-10",
         description:
-          "Avec Gabriel Lopez et Lonny Le Dez (encadrant : Samuel Ligonnière) : modèles logit et probit sur 18 pays (1870 à aujourd'hui) pour identifier les indicateurs macro-financiers annonciateurs de crises.",
-        href: "/papers/econometrie-crises-financieres.pdf",
+          "Projet de groupe : modèles logit et probit sur 18 pays (1870 à aujourd'hui) pour identifier les indicateurs macro-financiers annonciateurs de crises.",
       },
     ],
     pages: {
@@ -266,24 +298,21 @@ export const content: Record<Locale, LocaleContent> = {
           "What role do volatility and correlation forecasts play in the effectiveness of minimum-variance allocation strategies?",
         date: "2026-08-14",
         description:
-          "Master's thesis — Risk & Asset Management (Paris-Saclay, supervised by Pierre Clauss): a factorial grid crossing two variance models (empirical, GARCH) and three correlation models (empirical, Ledoit-Wolf shrinkage, DCC), backtested on 281 US stocks (2005–2025). Correlation shrinkage systematically reduces realized minimum-variance portfolio risk; GARCH worsens it; DCC brings no robust gain in any configuration.",
-        href: "/papers/memoire-m2-minimum-variance.pdf",
+          "Master's thesis — Risk & Asset Management (Paris-Saclay): a factorial grid crossing two variance models (empirical, GARCH) and three correlation models (empirical, Ledoit-Wolf shrinkage, DCC), backtested on 281 US stocks (2005–2025). Correlation shrinkage systematically reduces realized minimum-variance portfolio risk; GARCH worsens it; DCC brings no robust gain in any configuration.",
       },
       {
         slug: "memoire-m1-chocs-geopolitiques",
         title: "Differentiated Market Reactions to Geopolitical Shocks",
         date: "2025-08-01",
         description:
-          "Master's thesis — Risk & Asset Management (Paris-Saclay, supervised by Nada Mselmi): gold, oil (WTI) and equity indices (S&P 500, MSCI Asia) facing geopolitical shocks 2017–2023, using the GPR index (Caldara-Iacoviello) and VAR / DCC-GARCH models. Gold confirms its safe-haven role; oil's reaction depends on the nature of the shock.",
-        href: "/papers/memoire-m1-chocs-geopolitiques.pdf",
+          "Master's thesis — Risk & Asset Management (Paris-Saclay): gold, oil (WTI) and equity indices (S&P 500, MSCI Asia) facing geopolitical shocks 2017–2023, using the GPR index (Caldara-Iacoviello) and VAR / DCC-GARCH models. Gold confirms its safe-haven role; oil's reaction depends on the nature of the shock.",
       },
       {
         slug: "memoire-m1-finance-inegalites",
         title: "Finance and Income Inequality: A Modern Approach",
         date: "2024-05-01",
         description:
-          "Master's thesis — Corporate Finance (IAE Bordeaux, supervised by Jessica Fouilloux Thomasset): 136 countries, 1980–2021 — financial development follows an inverted-U relationship with income inequality (IMF's FD index), with a turning point around 0.49. Confirms the Greenwood and Jovanic (1990) hypothesis.",
-        href: "/papers/memoire-m1-finance-inegalites.pdf",
+          "Master's thesis — Corporate Finance (IAE Bordeaux): 136 countries, 1980–2021 — financial development follows an inverted-U relationship with income inequality (IMF's FD index), with a turning point around 0.49. Confirms the Greenwood and Jovanic (1990) hypothesis.",
       },
     ],
     journal: [
@@ -300,40 +329,35 @@ export const content: Record<Locale, LocaleContent> = {
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
         date: "2026-04-10",
         description:
-          "With Inès Chakib, Cyril Zaki and Gabriel Lopez (ENSIIE, prof. Sergio Pulido): SABR vs Heston comparison on SPX and VIX options, standard and joint calibration. SABR dominates on SPX (RMSE 0.43 pt) but fails on VIX (117 pts); the joint version fixes VIX (14.7 pts) at the cost of SPX (0.89 pt). Joint Heston offers the best overall compromise. Empirical Hölder regularity close to 0.5 for all models, confirming standard Brownian dynamics.",
-        href: "/papers/sabr-heston-spx-vix.pdf",
+          "Group project (ENSIIE): SABR vs Heston comparison on SPX and VIX options, standard and joint calibration. SABR dominates on SPX (RMSE 0.43 pt) but fails on VIX (117 pts); the joint version fixes VIX (14.7 pts) at the cost of SPX (0.89 pt). Joint Heston offers the best overall compromise. Empirical Hölder regularity close to 0.5 for all models, confirming standard Brownian dynamics.",
       },
       {
         slug: "esg-financial-cycles",
         title: "ESG, Financial Cycles and Extreme Risk",
         date: "2025-12-11",
         description:
-          "With Gabriel Lopez and Cyril Zaki: do green portfolios really have a different risk profile than brown ones? RiskMetrics revisited (GARCH, Student distribution) for VaR and Expected Shortfall, copulas for crisis-period dependence, Kalman filter to isolate sectoral financial cycles.",
-        href: "/papers/esg-financial-cycles.pdf",
+          "Group project: do green portfolios really have a different risk profile than brown ones? RiskMetrics revisited (GARCH, Student distribution) for VaR and Expected Shortfall, copulas for crisis-period dependence, Kalman filter to isolate sectoral financial cycles.",
       },
       {
         slug: "asset-management-group-project",
         title: "Robust GMV, Machine Learning Views & Portfolio Insurance",
         date: "2025-12-17",
         description:
-          "With Gabriel Lopez and Cyril Zaki: robust global minimum-variance portfolio (Ledoit-Wolf), dynamic allocation with Machine Learning views (XGBoost + Black-Litterman), portfolio insurance strategies (OBPI vs CPPI, Monte Carlo simulations).",
-        href: "/papers/asset-management-group-project.pdf",
+          "Group project: robust global minimum-variance portfolio (Ledoit-Wolf), dynamic allocation with Machine Learning views (XGBoost + Black-Litterman), portfolio insurance strategies (OBPI vs CPPI, Monte Carlo simulations).",
       },
       {
         slug: "econometrie-cac40",
         title: "CAC 40 Econometrics — CISS, VIX, HICP",
         date: "2025-01-15",
         description:
-          "With Gabriel Lopez and Lonny Le Dez: modeling CAC 40 fluctuations via the CISS (systemic stress), VIX and inflation (HICP), with Google Trends as behavioral variables. Inverted-U relationship for the VIX, critical threshold ≈ 23.3.",
-        href: "/papers/econometrie-cac40.pdf",
+          "Group project: modeling CAC 40 fluctuations via the CISS (systemic stress), VIX and inflation (HICP), with Google Trends as behavioral variables. Inverted-U relationship for the VIX, critical threshold ≈ 23.3.",
       },
       {
         slug: "econometrie-crises-financieres",
         title: "What Triggers Financial Crises",
         date: "2025-01-10",
         description:
-          "With Gabriel Lopez and Lonny Le Dez (supervisor: Samuel Ligonnière): logit and probit models across 18 countries (1870 to today) to identify macro-financial early-warning indicators for crises.",
-        href: "/papers/econometrie-crises-financieres.pdf",
+          "Group project: logit and probit models across 18 countries (1870 to today) to identify macro-financial early-warning indicators for crises.",
       },
     ],
     pages: {
