@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { HeroVideo } from "@/components/hero-video";
+import { InteractiveVideoCard } from "@/components/interactive-video-card";
 import { PetalBurst } from "@/components/petal-burst";
 
 function randomBetween(min: number, max: number) {
@@ -14,11 +14,23 @@ export function SidebarVisual() {
   const frameRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<Animation | null>(null);
   const isFirstRender = useRef(true);
+  const [showCard, setShowCard] = useState(false);
   const [burst, setBurst] = useState<{
     seed: number;
     side: number;
     count: number;
   } | null>(null);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const syncVisibility = () => setShowCard(desktop.matches);
+    const initialSync = window.setTimeout(syncVisibility, 0);
+    desktop.addEventListener("change", syncVisibility);
+    return () => {
+      window.clearTimeout(initialSync);
+      desktop.removeEventListener("change", syncVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -89,7 +101,7 @@ export function SidebarVisual() {
       style={{ perspective: "900px" }}
     >
       <div ref={frameRef} className="h-full w-full" style={{ transformStyle: "preserve-3d" }}>
-        <HeroVideo />
+        {showCard ? <InteractiveVideoCard /> : null}
       </div>
       {burst && (
         <PetalBurst

@@ -59,18 +59,18 @@ export default function Home() {
               longExtra={
                 <>
                   <ReadingCard />
-                  <div className="flex gap-4">
+                  <div className="flex items-start gap-4">
+                    <p className="min-w-0 flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
+                      {c.combatSportsBlurb}
+                    </p>
                     <ExpandableImage
                       src={media.combatSportsPhoto}
                       alt={c.combatSportsCaption}
-                      width={96}
-                      height={128}
-                      className="h-32 w-24 rounded-sm shadow-sm"
-                      hoverClassName="hover:scale-[1.03] hover:-rotate-[0.5deg]"
+                      width={828}
+                      height={1472}
+                      className="h-32 w-24 shrink-0 rotate-[1.7deg] rounded-sm shadow-sm"
+                      hoverClassName="hover:scale-[1.03] hover:-rotate-[0.8deg]"
                     />
-                    <p className="flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
-                      {c.combatSportsBlurb}
-                    </p>
                   </div>
                   <div className="flex gap-4">
                     <p className="flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
