@@ -45,12 +45,6 @@ export default function Home() {
                 zixload
               </a>
             )}
-            <a
-              href={`mailto:${site.email}`}
-              className="underline decoration-zinc-300 underline-offset-4 transition-colors hover:text-[var(--accent)] hover:decoration-[var(--accent)] dark:decoration-zinc-700"
-            >
-              email
-            </a>
           </div>
           <div style={{ animation: "fadeUp 0.7s ease-out 270ms both" }}>
             <BioTabs
@@ -92,28 +86,6 @@ export default function Home() {
         <section
           className="flex flex-col gap-4"
           style={{ animation: "fadeUp 0.7s ease-out 360ms both" }}
-        >
-          <h2 className="text-lg font-bold tracking-tight">
-            {c.notesHeading}
-          </h2>
-          <ul className="flex flex-col gap-2 text-sm">
-            {c.notes.map((note) => (
-              <li key={note.href} className="flex items-baseline gap-2">
-                <span className="h-1.5 w-1.5 shrink-0 bg-zinc-400 dark:bg-zinc-600" />
-                <Link
-                  href={note.href}
-                  className="text-zinc-700 underline decoration-zinc-300 hover:decoration-[var(--accent)] dark:text-zinc-300 dark:decoration-zinc-700"
-                >
-                  {note.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section
-          className="flex flex-col gap-4"
-          style={{ animation: "fadeUp 0.7s ease-out 450ms both" }}
         >
           <h2 className="text-lg font-bold tracking-tight">
             {c.blogsHeading}

@@ -1,0 +1,15 @@
+[
+  {
+    "slug": "putty-ecdsa-nonce-bias",
+    "date": "2026-08-20",
+    "section": "journal",
+    "title": {
+      "fr": "PoC — CVE-2024-31497 : biais de nonce ECDSA dans PuTTY",
+      "en": "PoC — CVE-2024-31497: ECDSA Nonce Bias in PuTTY"
+    },
+    "description": {
+      "fr": "Comment 9 bits de nonce biaisés dans PuTTY < 0.81 permettent de retrouver une clé privée ECDSA P-521 via le Hidden Number Problem et une réduction de réseau.",
+      "en": "How 9 biased nonce bits in PuTTY < 0.81 let you recover an ECDSA P-521 private key via the Hidden Number Problem and lattice reduction."
+    }
+  }
+]

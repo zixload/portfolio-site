@@ -26,7 +26,7 @@ type BookPage =
       kind: "quote";
       paragraphs: string[];
       attribution: string;
-      illustration?: PageIllustration;
+      illustrations?: PageIllustration[];
     };
 
 function PageArt({ illustration }: { illustration: PageIllustration }) {
@@ -71,7 +71,15 @@ function PageContent({ page, number }: { page?: BookPage; number: number }) {
         ))}
       </blockquote>
       <p className="shadow-book__attribution">{page.attribution}</p>
-      {page.illustration ? <PageArt illustration={page.illustration} /> : null}
+      {page.illustrations?.length === 1 ? (
+        <PageArt illustration={page.illustrations[0]} />
+      ) : page.illustrations?.length ? (
+        <div className="shadow-book__page-art-gallery">
+          {page.illustrations.map((illustration) => (
+            <PageArt key={illustration.src} illustration={illustration} />
+          ))}
+        </div>
+      ) : null}
       <span className="shadow-book__folio">{String(number).padStart(2, "0")}</span>
     </div>
   );
@@ -105,21 +113,25 @@ export function ShadowSlaveBook() {
         "A nameless slave ascended the Black Mountain. Both heroes and monsters fell by his hand. Unbroken, he entered the ruined temple of a long-forgotten god and spilled his blood on the sacred altar. The gods were dead, and yet they listened.",
       ],
       attribution: "Chapter 15, Shadow Slave",
-      illustration: {
-        src: "/media/shadow-slave-lost-from-light.jpg",
-        alt: "A dark portrait of Lost from Light",
-        shape: "portrait",
-      },
+      illustrations: [
+        {
+          src: "/media/shadow-slave-page-2.webp",
+          alt: "A frozen ruined temple beneath a pale light",
+          shape: "wide",
+        },
+      ],
     },
     {
       kind: "quote",
       paragraphs: [currentlyReading.quote],
       attribution: currentlyReading.quoteNote,
-      illustration: {
-        src: "/media/shadow-slave-snow-march.jpg",
-        alt: "A lone figure walking through a snowstorm",
-        shape: "wide",
-      },
+      illustrations: [
+        {
+          src: "/media/shadow-slave-page-3.webp",
+          alt: "Nephis, the Star of Ruin",
+          shape: "portrait",
+        },
+      ],
     },
     {
       kind: "quote",
@@ -130,6 +142,13 @@ export function ShadowSlaveBook() {
         "He wiped his face with an elbow. “Actually, that's not true. I did find something. I found out that I was right all along!”",
       ],
       attribution: "Chapter 1060, The Fall of Falcon Scott (78)",
+      illustrations: [
+        {
+          src: "/media/shadow-slave-page-4-arctic-worm.webp",
+          alt: "A warrior facing the Arctic Abundance",
+          shape: "wide",
+        },
+      ],
     },
     {
       kind: "quote",
@@ -137,11 +156,13 @@ export function ShadowSlaveBook() {
         "Who are you to dare stare me down, beast? I am Lost from Light, who was born from the shadows. I am the rightful heir of death and the bastard son of fate. Wherever I go, ruin follows. If you had any sense, you would have run away as soon as you saw me.",
       ],
       attribution: "To Azure Serpent — Chapter 1274, Time of Truth",
-      illustration: {
-        src: "/media/shadow-slave-winter-rider.jpg",
-        alt: "A solitary rider in a pale winter forest",
-        shape: "rider",
-      },
+      illustrations: [
+        {
+          src: "/media/shadow-slave-page-5.webp",
+          alt: "A warrior confronting a frozen giant",
+          shape: "wide",
+        },
+      ],
     },
   ];
   const spreadCount = Math.ceil(pages.length / 2);

@@ -1,3 +1,5 @@
+import { managedEntries } from "@/lib/managed-posts";
+
 // Contenu centralisé du site — à adapter au fil du temps.
 // Bilingue FR/EN : voir `content` plus bas. `site`, `links` et les chemins
 // d'images restent partagés entre les deux langues.
@@ -95,7 +97,6 @@ type LocaleContent = {
     quote: string;
     quoteNote: string;
   };
-  notes: { label: string; href: string }[];
   beliefs: string[];
   research: Entry[];
   journal: Entry[];
@@ -105,7 +106,6 @@ type LocaleContent = {
     convictions: { title: string };
   };
   blogsHeading: string;
-  notesHeading: string;
 };
 
 export const content: Record<Locale, LocaleContent> = {
@@ -139,7 +139,6 @@ export const content: Record<Locale, LocaleContent> = {
         "Her already prolific fame and exalted status instantly soared as high as the sun. While Nephis slept, her arrival was already creating titanic waves in the mindset of millions of people. In front of the Awakened Academy, a hundred thousand candles continued to burn despite the falling snow. ...And cast by their flames, a hundred thousand shadows danced on the ground.",
       quoteNote: "Chapitre 766 — Making History",
     },
-    notes: [{ label: "Ce que je crois", href: "/convictions" }],
     beliefs: [
       "Un backtest qui marche trop bien est un bug, pas un edge.",
       "Le shrinkage simple bat souvent le modèle sophistiqué mal calibré.",
@@ -158,6 +157,7 @@ export const content: Record<Locale, LocaleContent> = {
       "Douter de ses propres résultats avant de les défendre.",
     ],
     research: [
+      ...managedEntries("fr", "research"),
       {
         slug: "memoire-m2-minimum-variance",
         title:
@@ -183,14 +183,7 @@ export const content: Record<Locale, LocaleContent> = {
       },
     ],
     journal: [
-      {
-        slug: "putty-ecdsa-nonce-bias",
-        title: "PoC — CVE-2024-31497 : biais de nonce ECDSA dans PuTTY",
-        date: "2026-08-20",
-        description:
-          "Comment 9 bits de nonce biaisés dans PuTTY < 0.81 permettent de retrouver une clé privée ECDSA P-521 via le Hidden Number Problem et une réduction de réseau.",
-        post: true,
-      },
+      ...managedEntries("fr", "journal"),
       {
         slug: "sabr-heston-spx-vix",
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
@@ -241,7 +234,6 @@ export const content: Record<Locale, LocaleContent> = {
       convictions: { title: "Ce que je crois" },
     },
     blogsHeading: "Blogs",
-    notesHeading: "Notes",
   },
   en: {
     nav: [
@@ -273,7 +265,6 @@ export const content: Record<Locale, LocaleContent> = {
         "Her already prolific fame and exalted status instantly soared as high as the sun. While Nephis slept, her arrival was already creating titanic waves in the mindset of millions of people. In front of the Awakened Academy, a hundred thousand candles continued to burn despite the falling snow. ...And cast by their flames, a hundred thousand shadows danced on the ground.",
       quoteNote: "Chapter 766 — Making History",
     },
-    notes: [{ label: "What I Believe", href: "/convictions" }],
     beliefs: [
       "A backtest that works too well is a bug, not an edge.",
       "Simple shrinkage often beats a poorly calibrated sophisticated model.",
@@ -292,6 +283,7 @@ export const content: Record<Locale, LocaleContent> = {
       "Doubt your own results before you defend them.",
     ],
     research: [
+      ...managedEntries("en", "research"),
       {
         slug: "memoire-m2-minimum-variance",
         title:
@@ -316,14 +308,7 @@ export const content: Record<Locale, LocaleContent> = {
       },
     ],
     journal: [
-      {
-        slug: "putty-ecdsa-nonce-bias",
-        title: "PoC — CVE-2024-31497: ECDSA Nonce Bias in PuTTY",
-        date: "2026-08-20",
-        description:
-          "How 9 biased nonce bits in PuTTY < 0.81 let you recover an ECDSA P-521 private key via the Hidden Number Problem and lattice reduction.",
-        post: true,
-      },
+      ...managedEntries("en", "journal"),
       {
         slug: "sabr-heston-spx-vix",
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
@@ -374,7 +359,6 @@ export const content: Record<Locale, LocaleContent> = {
       convictions: { title: "What I Believe" },
     },
     blogsHeading: "Blogs",
-    notesHeading: "Notes",
   },
 };
 

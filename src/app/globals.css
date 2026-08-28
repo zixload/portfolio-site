@@ -638,6 +638,27 @@ a {
   opacity: 0.9;
 }
 
+.shadow-book__page-art-gallery {
+  display: grid;
+  width: 92%;
+  margin-top: auto;
+  align-self: center;
+  gap: clamp(0.3rem, 0.7vw, 0.5rem);
+}
+
+.shadow-book__page-art-gallery .shadow-book__page-art {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  aspect-ratio: 4.8 / 1;
+}
+
+.shadow-book__page-art-gallery .shadow-book__page-art:nth-child(2) {
+  aspect-ratio: 3.8 / 1;
+  transform: rotate(0.7deg);
+}
+
 .shadow-book__page-art--opening {
   width: 100%;
   height: 26%;
