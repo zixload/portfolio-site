@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { SidebarVisual } from "@/components/sidebar-visual";
+import { SmoothScroll } from "@/components/smooth-scroll";
+import { SoundEffects } from "@/components/sound-effects";
 import { LocaleProvider } from "@/lib/locale-context";
-import { content, site } from "@/lib/content";
+import { content, showSidebarVisual, site } from "@/lib/content";
 import "./globals.css";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
 });
 
@@ -20,20 +27,24 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="fr"
-      className={`${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-[var(--background)] font-serif text-[var(--foreground)]">
+      <body className="flex min-h-full flex-col bg-[var(--background)] font-sans text-[0.9375rem] text-[var(--foreground)]">
         <LocaleProvider>
+          <SmoothScroll />
+          <SoundEffects />
           <Nav />
-          <main className="mx-auto grid w-full max-w-5xl flex-1 gap-16 px-6 py-16 sm:px-0 md:grid-cols-[1fr_320px] md:items-start">
+          {/* Colonne unique centrée : la vidéo est passée sous le contenu,
+              à la même largeur que le texte, et reste présente sur toutes les
+              pages. */}
+          <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-14 px-6 py-16 sm:px-0">
             <div className="min-w-0">{children}</div>
-            <div
-              className="hidden md:sticky md:top-10 md:block"
-              style={{ animation: "fadeUp 0.7s ease-out 180ms both" }}
-            >
-              <SidebarVisual />
-            </div>
+            {showSidebarVisual && (
+              <div style={{ animation: "fadeUp 0.7s ease-out 180ms both" }}>
+                <SidebarVisual />
+              </div>
+            )}
           </main>
         </LocaleProvider>
       </body>

@@ -13,49 +13,16 @@ export const site = {
   location: "Paris",
 };
 
+// Bascule le lien "show more" qui déplie la bio longue sous la bio courte.
+export const showLongBio = true;
+
+// Vidéo de fin de page désactivée : la source (480x624, portrait) est trop
+// petite pour la largeur actuelle. À remettre à `true` avec un rendu plus large.
+export const showSidebarVisual = false;
+
 export const links = [
   { label: "GitHub", href: "https://github.com/zixload" },
 ];
-
-export type PlatformKey = "htb" | "thm" | "rootme";
-
-// Logos cliquables (sans fond ni bordure) affichés à côté des entrées liées à
-// une plateforme de CTF/pentest — pointent vers le profil public.
-export const platforms: Record<
-  PlatformKey,
-  {
-    label: string;
-    href: string;
-    logo: string;
-    width: number;
-    height: number;
-    scale?: number; // ajustement visuel relatif entre logos de tailles natives différentes
-  }
-> = {
-  htb: {
-    label: "htb",
-    href: "https://profile.hackthebox.com/profile/019d8bcc-0ba4-7334-a9f5-504b43d4749d",
-    logo: "/media/icons/htb-logo.png",
-    width: 280,
-    height: 280,
-  },
-  thm: {
-    label: "thm",
-    href: "https://tryhackme.com/p/zixload",
-    logo: "/media/icons/thm-logo.png",
-    width: 1200,
-    height: 675,
-    scale: 1.35,
-  },
-  rootme: {
-    label: "rootme",
-    href: "https://www.root-me.org/zixload",
-    logo: "/media/icons/rootme-logo.png",
-    width: 24,
-    height: 24,
-    scale: 0.62,
-  },
-};
 
 export type Entry = {
   slug: string;
@@ -64,7 +31,15 @@ export type Entry = {
   description: string;
   href?: string; // lien externe optionnel (PDF, repo, etc.)
   post?: boolean; // true = page interne /blog/{slug} (Markdown), rendu via src/posts/{slug}.md
-  platform?: PlatformKey; // badge cliquable vers le profil HTB/THM/Root-Me
+  image?: string; // vignette illustrant l'entrée, ex. "/media/writing/mon-post.png"
+  wip?: boolean; // article encore en cours d'écriture : affiche la pastille "writing…"
+};
+
+// Terme survolable dans la ligne des centres d'intérêt : au survol, ses images
+// se déploient en petites cartes au-dessus du mot.
+export type Interest = {
+  label: string;
+  images: string[];
 };
 
 // Images partagées entre les deux langues.
@@ -85,6 +60,10 @@ type LocaleContent = {
   nav: { href: string; label: string }[];
   bio: string[];
   bioLong: string[];
+  readingBlurb: string; // paragraphe lecture, affiché à côté de la carte du livre
+  githubLine: string; // phrase qui introduit le lien GitHub, dans la bio
+  bioMoreLabel: string; // déplie la bio longue
+  bioLessLabel: string; // la referme
   combatSportsBlurb: string;
   combatSportsCaption: string;
   lolBlurb: string;
@@ -98,6 +77,7 @@ type LocaleContent = {
     quoteNote: string;
   };
   beliefs: string[];
+  interests: { heading: string; items: Interest[] };
   research: Entry[];
   journal: Entry[];
   pages: {
@@ -113,16 +93,19 @@ export const content: Record<Locale, LocaleContent> = {
     nav: [
       { href: "/", label: "Accueil" },
       { href: "/recherche", label: "Recherche" },
-      { href: "/journal", label: "Journal" },
     ],
     bio: [
       "Je suis un étudiant plutôt curieux mais basique, j'apprends la finance quantitative, la gestion des risques et des actifs. D'autres passions m'animent aussi : le code, les languages bas niveau, la sécurité informatique, la cryptographie et la lecture.",
       "Le travail auquel j'aspire serait de contribuer à la recherche et au développement de stratégies quantitatives, et plus tard rejoindre une équipe Red Team ou de recherche en sécurité informatique.",
     ],
     bioLong: [
-      "Licence économie-gestion à Bayonne, puis un an de Master corporate finance à Bordeaux puis actuellement entrain de finir un Master gestion des risques et des actifs à Paris-Saclay. J'ai eu l'occasion de travailler sur des projets de recherche en finance quantitative, notamment sur la calibration de modèles stochastiques, gestion de portefeuilles et analyse de risques extrêmes.",
-      "En ce moment, je suis plongé dans Shadow Slave (Guiltythree) : un webnovel avec un univers énorme. Les premiers volumes sont hyper prenants, difficile de décrocher. Ce qui m'a le plus plus pendant ma lecture, c'est la plume de l'auteur qui arrive à faire en sorte que quand on lit, il y a un sorte de mix entre la narration et ce que pense Sunny le personnage principal. C'est un peu comme si on était dans sa tête, et ça rend la lecture très immersive.",
+      "Licence économie-gestion à Bayonne, un an de Master corporate finance à Bordeaux, et je finis un Master gestion des risques et des actifs à Paris-Saclay. En chemin : calibration de modèles stochastiques, gestion de portefeuilles, risques extrêmes.",
     ],
+    readingBlurb:
+      "En ce moment je lis Shadow Slave (Guiltythree). Ce qui me plaît, c'est la plume de l'auteur : la narration se mêle aux pensées de Sunny, on se croirait dans sa tête.",
+    githubLine: "Tu peux voir ce que je fais sur",
+    bioMoreLabel: "show more",
+    bioLessLabel: "show less",
     combatSportsBlurb:
       "J'ai pratiqué la boxe thaï pendant pas mal d'années, et j'ai adoré le côté stratégique et technique. Je regarde aussi beaucoup de MMA, et j'ai hâte que Salahdine Parnasse devienne champion, parce que oui, il le sera à l'UFC.",
     lolBlurb:
@@ -156,12 +139,26 @@ export const content: Record<Locale, LocaleContent> = {
       "Écrire clairement force à penser clairement.",
       "Douter de ses propres résultats avant de les défendre.",
     ],
+    interests: {
+      heading: "Centres d'intérêt",
+      items: [
+        { label: "boxe thaï", images: [media.combatSportsPhoto] },
+        { label: "league of legends", images: media.lolScreens.slice(0, 3) },
+        {
+          label: "webnovels",
+          images: [
+            media.currentlyReadingCover,
+            media.currentlyReadingIllustration,
+          ],
+        },
+      ],
+    },
     research: [
       ...managedEntries("fr", "research"),
       {
         slug: "memoire-m2-minimum-variance",
         title:
-          "Quel rôle jouent respectivement les prévisions de volatilité et de corrélation dans l'efficacité des stratégies d'allocation minimum-variance ?",
+          "Décomposition de la covariance, prévisions de volatilité et de corrélation pour l'allocation minimum-variance",
         date: "2026-08-14",
         description:
           "Mémoire M2 — Gestion des Risques et des Actifs (Paris-Saclay) : grille factorielle croisant deux modèles de variance (empirique, GARCH) et trois modèles de corrélation (empirique, shrinkage Ledoit-Wolf, DCC), backtestée sur 281 actions américaines (2005–2025). Le shrinkage de la corrélation réduit systématiquement le risque réalisé du portefeuille minimum-variance ; le GARCH le détériore ; le DCC n'apporte de gain robuste dans aucune configuration.",
@@ -189,14 +186,8 @@ export const content: Record<Locale, LocaleContent> = {
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
         date: "2026-04-10",
         description:
-          "Projet de groupe (ENSIIE) : comparaison SABR vs Heston sur options SPX et VIX, en calibration standard et jointe. SABR domine sur SPX (RMSE 0,43 pt) mais échoue sur VIX (117 pts) ; la version jointe corrige le VIX (14,7 pts) au prix du SPX (0,89 pt). Heston joint offre le meilleur compromis global. Régularité de Hölder empirique proche de 0,5 pour tous les modèles, confirmant une dynamique brownienne standard.",
-      },
-      {
-        slug: "esg-financial-cycles",
-        title: "ESG, Financial Cycles and Extreme Risk",
-        date: "2025-12-11",
-        description:
-          "Projet de groupe : les portefeuilles green ont-ils vraiment un profil de risque différent des brown ? RiskMetrics revisité (GARCH, distribution de Student) pour la VaR et l'Expected Shortfall, copules pour la dépendance en période de crise, filtre de Kalman pour isoler les cycles financiers sectoriels.",
+          "Projet de groupe (ENSIIE) : comparaison SABR vs Heston sur options SPX et VIX, en calibration standard et jointe. SABR domine sur SPX (RMSE 0,43 pt) mais échoue sur VIX (117 pts) ; la version jointe corrige le VIX (14,7 pts) au prix du SPX (0,89 pt). Heston joint offre le meilleur compromis global.",
+        post: true,
       },
       {
         slug: "asset-management-group-project",
@@ -204,20 +195,7 @@ export const content: Record<Locale, LocaleContent> = {
         date: "2025-12-17",
         description:
           "Projet de groupe : portefeuille à variance minimale robuste (Ledoit-Wolf), allocation dynamique avec vues Machine Learning (XGBoost + Black-Litterman), stratégies d'assurance de portefeuille (OBPI vs CPPI, simulations Monte Carlo).",
-      },
-      {
-        slug: "econometrie-cac40",
-        title: "Économétrie du CAC 40 — CISS, VIX, HICP",
-        date: "2025-01-15",
-        description:
-          "Projet de groupe : modélisation des fluctuations du CAC 40 via le CISS (stress systémique), le VIX et l'inflation (HICP), avec tendances Google en variables comportementales. Relation en U inversé du VIX, seuil critique ≈ 23,3.",
-      },
-      {
-        slug: "econometrie-crises-financieres",
-        title: "Les facteurs déclencheurs des crises financières",
-        date: "2025-01-10",
-        description:
-          "Projet de groupe : modèles logit et probit sur 18 pays (1870 à aujourd'hui) pour identifier les indicateurs macro-financiers annonciateurs de crises.",
+        post: true,
       },
     ],
     pages: {
@@ -239,16 +217,19 @@ export const content: Record<Locale, LocaleContent> = {
     nav: [
       { href: "/", label: "Home" },
       { href: "/recherche", label: "Research" },
-      { href: "/journal", label: "Journal" },
     ],
     bio: [
       "I'm a fairly curious but ordinary student, learning quantitative finance, risk and asset management. A few other things keep me busy too: coding, low-level languages, cybersecurity, cryptography, and reading.",
       "The work I'm aiming for would be contributing to research and development of quantitative strategies, and later joining a Red Team or a security research team.",
     ],
     bioLong: [
-      "Economics-management degree in Bayonne, then a year of a Corporate Finance Master's in Bordeaux, currently finishing a Risk & Asset Management Master's at Paris-Saclay. I've had the chance to work on quantitative finance research projects, notably on stochastic model calibration, portfolio management and extreme risk analysis.",
-      "Right now I'm deep into Shadow Slave (Guiltythree): a webnovel with a massive universe. The first volumes are incredibly gripping, hard to put down. What I loved most while reading is the author's writing, which blends narration with what Sunny, the main character, is thinking — almost like being inside his head, which makes it a very immersive read.",
+      "Economics-management degree in Bayonne, a year of a Corporate Finance Master's in Bordeaux, and I'm finishing a Risk & Asset Management Master's at Paris-Saclay. Along the way: stochastic model calibration, portfolio management, extreme risk.",
     ],
+    readingBlurb:
+      "Right now I'm reading Shadow Slave (Guiltythree). What I like is the author's writing: narration blends into Sunny's thoughts, so it feels like being inside his head.",
+    githubLine: "You can check my work on",
+    bioMoreLabel: "show more",
+    bioLessLabel: "show less",
     combatSportsBlurb:
       "I practiced Muay Thai for quite a few years, and loved the strategic and technical side of it. I also watch a lot of MMA — and I can't wait for Salahdine Parnasse to become champion, because yes, he will be UFC champion.",
     combatSportsCaption: "With Salahdine Parnasse",
@@ -282,12 +263,26 @@ export const content: Record<Locale, LocaleContent> = {
       "Writing clearly forces you to think clearly.",
       "Doubt your own results before you defend them.",
     ],
+    interests: {
+      heading: "Interests",
+      items: [
+        { label: "muay thai", images: [media.combatSportsPhoto] },
+        { label: "league of legends", images: media.lolScreens.slice(0, 3) },
+        {
+          label: "webnovels",
+          images: [
+            media.currentlyReadingCover,
+            media.currentlyReadingIllustration,
+          ],
+        },
+      ],
+    },
     research: [
       ...managedEntries("en", "research"),
       {
         slug: "memoire-m2-minimum-variance",
         title:
-          "What role do volatility and correlation forecasts play in the effectiveness of minimum-variance allocation strategies?",
+          "Covariance Decomposition: Volatility and Correlation Forecasts for Minimum-Variance Allocation",
         date: "2026-08-14",
         description:
           "Master's thesis — Risk & Asset Management (Paris-Saclay): a factorial grid crossing two variance models (empirical, GARCH) and three correlation models (empirical, Ledoit-Wolf shrinkage, DCC), backtested on 281 US stocks (2005–2025). Correlation shrinkage systematically reduces realized minimum-variance portfolio risk; GARCH worsens it; DCC brings no robust gain in any configuration.",
@@ -314,14 +309,8 @@ export const content: Record<Locale, LocaleContent> = {
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
         date: "2026-04-10",
         description:
-          "Group project (ENSIIE): SABR vs Heston comparison on SPX and VIX options, standard and joint calibration. SABR dominates on SPX (RMSE 0.43 pt) but fails on VIX (117 pts); the joint version fixes VIX (14.7 pts) at the cost of SPX (0.89 pt). Joint Heston offers the best overall compromise. Empirical Hölder regularity close to 0.5 for all models, confirming standard Brownian dynamics.",
-      },
-      {
-        slug: "esg-financial-cycles",
-        title: "ESG, Financial Cycles and Extreme Risk",
-        date: "2025-12-11",
-        description:
-          "Group project: do green portfolios really have a different risk profile than brown ones? RiskMetrics revisited (GARCH, Student distribution) for VaR and Expected Shortfall, copulas for crisis-period dependence, Kalman filter to isolate sectoral financial cycles.",
+          "Group project (ENSIIE): SABR vs Heston comparison on SPX and VIX options, standard and joint calibration. SABR dominates on SPX (RMSE 0.43 pt) but fails on VIX (117 pts); the joint version fixes VIX (14.7 pts) at the cost of SPX (0.89 pt). Joint Heston offers the best overall compromise.",
+        post: true,
       },
       {
         slug: "asset-management-group-project",
@@ -329,20 +318,7 @@ export const content: Record<Locale, LocaleContent> = {
         date: "2025-12-17",
         description:
           "Group project: robust global minimum-variance portfolio (Ledoit-Wolf), dynamic allocation with Machine Learning views (XGBoost + Black-Litterman), portfolio insurance strategies (OBPI vs CPPI, Monte Carlo simulations).",
-      },
-      {
-        slug: "econometrie-cac40",
-        title: "CAC 40 Econometrics — CISS, VIX, HICP",
-        date: "2025-01-15",
-        description:
-          "Group project: modeling CAC 40 fluctuations via the CISS (systemic stress), VIX and inflation (HICP), with Google Trends as behavioral variables. Inverted-U relationship for the VIX, critical threshold ≈ 23.3.",
-      },
-      {
-        slug: "econometrie-crises-financieres",
-        title: "What Triggers Financial Crises",
-        date: "2025-01-10",
-        description:
-          "Group project: logit and probit models across 18 countries (1870 to today) to identify macro-financial early-warning indicators for crises.",
+        post: true,
       },
     ],
     pages: {

@@ -1,7 +1,6 @@
 "use client";
 
 import { EntryList } from "@/components/entry-list";
-import { PlatformLinks } from "@/components/platform-links";
 import { useContent } from "@/lib/locale-context";
 
 export default function JournalPage() {
@@ -18,7 +17,6 @@ export default function JournalPage() {
         <p className="max-w-xl leading-relaxed text-zinc-600 dark:text-zinc-400">
           {c.pages.journal.description}
         </p>
-        <PlatformLinks />
       </div>
       <div style={{ animation: "fadeUp 0.7s ease-out 180ms both" }}>
         <EntryList entries={c.journal} />

@@ -85,7 +85,7 @@ function PageContent({ page, number }: { page?: BookPage; number: number }) {
   );
 }
 
-export function ShadowSlaveBook() {
+export function ShadowSlaveBook({ compact = false }: { compact?: boolean }) {
   const { currentlyReading } = useContent();
   const { locale } = useLocale();
   const [mounted, setMounted] = useState(false);
@@ -217,7 +217,11 @@ export function ShadowSlaveBook() {
 
   return (
     <>
-      <div className="shadow-book-teaser">
+      <div
+        className={`shadow-book-teaser${
+          compact ? " shadow-book-teaser--compact" : ""
+        }`}
+      >
         <button
           type="button"
           className="shadow-book-teaser__cover"

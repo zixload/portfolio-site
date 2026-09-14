@@ -6,6 +6,8 @@ export type ManagedPost = {
   section: "journal" | "research";
   title: { fr: string; en: string };
   description: { fr: string; en: string };
+  image?: string; // vignette, sinon un dégradé est généré depuis le slug
+  wip?: boolean; // encore en cours d'écriture
 };
 
 export const managedPosts = posts as ManagedPost[];
@@ -22,5 +24,7 @@ export function managedEntries(
       date: post.date,
       description: post.description[locale],
       post: true as const,
+      image: post.image,
+      wip: post.wip,
     }));
 }

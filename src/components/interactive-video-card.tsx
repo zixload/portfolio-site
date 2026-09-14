@@ -58,12 +58,15 @@ export function InteractiveVideoCard() {
       tracking = true;
       card.dataset.tracking = "true";
       updatePointer(event);
+      // La vidéo est à l'arrêt le reste du temps : c'est le survol qui la lance.
+      if (!reducedMotion.matches) void video.play().catch(() => {});
       if (!frameRef.current) frameRef.current = requestAnimationFrame(drawPixels);
     };
 
     const stopTracking = () => {
       tracking = false;
       card.dataset.tracking = "false";
+      video.pause();
       card.style.setProperty("--card-rotate-x", "0deg");
       card.style.setProperty("--card-rotate-y", "0deg");
       if (frameRef.current) cancelAnimationFrame(frameRef.current);

@@ -52,7 +52,7 @@ export function Markdown({ source }: { source: string }) {
             const isBlock = /language-|^$/.test(className ?? "") && className;
             if (!isBlock) {
               return (
-                <code className="rounded-sm bg-zinc-100 px-1 py-0.5 font-mono text-[0.9em] text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
+                <code className="rounded-sm bg-zinc-100 px-1 py-0.5 font-mono text-[0.9em] text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
                   {children}
                 </code>
               );
@@ -60,7 +60,7 @@ export function Markdown({ source }: { source: string }) {
             return <code className={className}>{children}</code>;
           },
           pre: ({ children }) => (
-            <pre className="overflow-x-auto rounded-sm bg-zinc-100 p-4 font-mono text-sm text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
+            <pre className="overflow-x-auto rounded-sm bg-zinc-100 p-4 font-mono text-sm text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
               {children}
             </pre>
           ),

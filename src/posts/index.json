@@ -1,15 +1,16 @@
 [
   {
-    "slug": "putty-ecdsa-nonce-bias",
-    "date": "2026-08-20",
+    "slug": "nanos-world-lua",
+    "date": "2026-09-14",
     "section": "journal",
     "title": {
-      "fr": "PoC — CVE-2024-31497 : biais de nonce ECDSA dans PuTTY",
-      "en": "PoC — CVE-2024-31497: ECDSA Nonce Bias in PuTTY"
+      "fr": "Lua côté serveur : carnet d'un serveur nanos world",
+      "en": "Lua on the Server Side: Notes from a nanos world Server"
     },
     "description": {
-      "fr": "Comment 9 bits de nonce biaisés dans PuTTY < 0.81 permettent de retrouver une clé privée ECDSA P-521 via le Hidden Number Problem et une réduction de réseau.",
-      "en": "How 9 biased nonce bits in PuTTY < 0.81 let you recover an ECDSA P-521 private key via the Hidden Number Problem and lattice reduction."
-    }
+      "fr": "Notes en cours : le Lua côté serveur, la façon dont un serveur de jeu exécute les scripts, et les questions d'optimisation que je rencontre en montant mon serveur.",
+      "en": "Notes in progress: server-side Lua, how a game server actually runs scripts, and the optimization questions I keep running into while building my server."
+    },
+    "wip": true
   }
 ]

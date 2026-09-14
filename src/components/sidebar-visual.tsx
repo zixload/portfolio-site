@@ -21,15 +21,11 @@ export function SidebarVisual() {
     count: number;
   } | null>(null);
 
+  // Montée après l'hydratation seulement : la carte lit des dimensions réelles
+  // et n'a rien à faire dans le HTML rendu côté serveur.
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 768px)");
-    const syncVisibility = () => setShowCard(desktop.matches);
-    const initialSync = window.setTimeout(syncVisibility, 0);
-    desktop.addEventListener("change", syncVisibility);
-    return () => {
-      window.clearTimeout(initialSync);
-      desktop.removeEventListener("change", syncVisibility);
-    };
+    const mounted = window.setTimeout(() => setShowCard(true), 0);
+    return () => window.clearTimeout(mounted);
   }, []);
 
   useEffect(() => {
@@ -97,7 +93,7 @@ export function SidebarVisual() {
 
   return (
     <div
-      className="relative aspect-[400/520] overflow-hidden rounded-lg"
+      className="relative aspect-[4/3] overflow-hidden rounded-lg"
       style={{ perspective: "900px" }}
     >
       <div ref={frameRef} className="h-full w-full" style={{ transformStyle: "preserve-3d" }}>

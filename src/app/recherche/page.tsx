@@ -19,7 +19,7 @@ export default function ResearchPage() {
         </p>
       </div>
       <div style={{ animation: "fadeUp 0.7s ease-out 180ms both" }}>
-        <EntryList entries={c.research} />
+        <EntryList entries={c.research} showThumbs={false} />
       </div>
     </div>
   );
