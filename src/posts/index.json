@@ -11,6 +11,7 @@
       "fr": "Notes en cours : le Lua côté serveur, la façon dont un serveur de jeu exécute les scripts, et les questions d'optimisation que je rencontre en montant mon serveur.",
       "en": "Notes in progress: server-side Lua, how a game server actually runs scripts, and the optimization questions I keep running into while building my server."
     },
-    "wip": true
+    "wip": true,
+    "image": "/media/writing/nanos-world-lua.jpg"
   }
 ]

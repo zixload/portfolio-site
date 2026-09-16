@@ -188,6 +188,7 @@ export const content: Record<Locale, LocaleContent> = {
         description:
           "Projet de groupe (ENSIIE) : comparaison SABR vs Heston sur options SPX et VIX, en calibration standard et jointe. SABR domine sur SPX (RMSE 0,43 pt) mais échoue sur VIX (117 pts) ; la version jointe corrige le VIX (14,7 pts) au prix du SPX (0,89 pt). Heston joint offre le meilleur compromis global.",
         post: true,
+        image: "/media/writing/sabr-heston-spx-vix.jpg",
       },
       {
         slug: "asset-management-group-project",
@@ -196,6 +197,7 @@ export const content: Record<Locale, LocaleContent> = {
         description:
           "Projet de groupe : portefeuille à variance minimale robuste (Ledoit-Wolf), allocation dynamique avec vues Machine Learning (XGBoost + Black-Litterman), stratégies d'assurance de portefeuille (OBPI vs CPPI, simulations Monte Carlo).",
         post: true,
+        image: "/media/writing/asset-management-group-project.jpg",
       },
     ],
     pages: {
@@ -311,6 +313,7 @@ export const content: Record<Locale, LocaleContent> = {
         description:
           "Group project (ENSIIE): SABR vs Heston comparison on SPX and VIX options, standard and joint calibration. SABR dominates on SPX (RMSE 0.43 pt) but fails on VIX (117 pts); the joint version fixes VIX (14.7 pts) at the cost of SPX (0.89 pt). Joint Heston offers the best overall compromise.",
         post: true,
+        image: "/media/writing/sabr-heston-spx-vix.jpg",
       },
       {
         slug: "asset-management-group-project",
@@ -319,6 +322,7 @@ export const content: Record<Locale, LocaleContent> = {
         description:
           "Group project: robust global minimum-variance portfolio (Ledoit-Wolf), dynamic allocation with Machine Learning views (XGBoost + Black-Litterman), portfolio insurance strategies (OBPI vs CPPI, Monte Carlo simulations).",
         post: true,
+        image: "/media/writing/asset-management-group-project.jpg",
       },
     ],
     pages: {
