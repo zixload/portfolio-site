@@ -56,6 +56,109 @@ export const media = {
   ],
 };
 
+// Carte qui s'ouvre au survol d'un mot du texte (voir RichText).
+export type InlineCard = {
+  images: string[];
+  title?: string;
+  subtitle?: string;
+  note?: string;
+  /** Par défaut : "photo" pour une image, "stack" pour plusieurs. */
+  layout?: "photo" | "stack" | "profile" | "cover";
+};
+
+// Noms propres uniquement : ils restent identiques dans les deux langues.
+export const cards: Record<string, InlineCard> = {
+  parnasse: {
+    images: [media.combatSportsPhoto],
+    title: "Salahdine Parnasse",
+    subtitle: "UFC",
+  },
+  lol: {
+    images: media.lolScreens.slice(0, 3),
+    title: "League of Legends",
+    subtitle: "Master · Challenger Flex",
+  },
+  shadowslave: {
+    images: [media.currentlyReadingCover],
+    title: "Shadow Slave",
+    subtitle: "Guiltythree",
+    layout: "cover",
+  },
+  github: {
+    images: ["/icon.png"],
+    title: "zix",
+    subtitle: "@zixload",
+    note: "github.com/zixload",
+    layout: "profile",
+  },
+};
+
+// Objets 3D qui flottent à droite d'un paragraphe (voir RichText, attribut
+// `obj:`). Rendus dans Blender par art/3d/studio.py, en mode `still`, orientés
+// de trois quarts vers le texte.
+export const objects: Record<
+  string,
+  { image: string; width: number; height: number; alt: string }
+> = {
+  weaver: {
+    image: "/media/objects/weaver.webp",
+    width: 226,
+    height: 300,
+    alt: "Masque de Weaver",
+  },
+};
+
+// Mots en gras suivis d'une petite icône unie, sombres au repos, qui prennent
+// leur couleur au survol du paragraphe (voir RichText, attribut `glow:`). Les
+// icônes sont dessinées dans rich-text.tsx.
+export const glows: Record<
+  string,
+  { icon: "trend" | "crosshair"; color: string }
+> = {
+  finance: { icon: "trend", color: "#4f46e5" },
+  redteam: { icon: "crosshair", color: "#e11d48" },
+};
+
+// Petites images collées au mot, à hauteur de texte (voir RichText, attribut
+// `pic:`) : « cover » pour une couverture, « object » pour un
+// rendu détouré. `sway` : l'objet est suspendu et se balance.
+export const pics: Record<
+  string,
+  {
+    src: string;
+    shape: "cover" | "object";
+    sway?: boolean;
+    width?: number; // taille réelle de l'image, pour garder ses proportions
+    height?: number;
+  }
+> = {
+  shadowslave: { src: media.currentlyReadingCover, shape: "cover" },
+  gloves: {
+    src: "/media/objects/gloves.webp",
+    shape: "object",
+    sway: true,
+    width: 179,
+    height: 263,
+  },
+};
+
+// Morceaux de la platine, en bas de l'accueil. Les fichiers audio vivent dans
+// public/media/music/ ; une pochette carrée de 320px suffit pour l'étiquette.
+export const music = [
+  {
+    title: "almost gone",
+    artist: "Albert Victor",
+    cover: "/media/music/almost-gone-cover.jpg",
+    src: "/media/music/almost-gone.mp3",
+  },
+  {
+    title: "in love with life",
+    artist: "Ophelia Wilde",
+    cover: "/media/music/in-love-with-life-cover.jpg",
+    src: "/media/music/in-love-with-life.mp3",
+  },
+];
+
 type LocaleContent = {
   nav: { href: string; label: string }[];
   bio: string[];
@@ -95,21 +198,21 @@ export const content: Record<Locale, LocaleContent> = {
       { href: "/recherche", label: "Recherche" },
     ],
     bio: [
-      "Je suis un étudiant plutôt curieux mais basique, j'apprends la finance quantitative, la gestion des risques et des actifs. D'autres passions m'animent aussi : le code, les languages bas niveau, la sécurité informatique, la cryptographie et la lecture.",
-      "Le travail auquel j'aspire serait de contribuer à la recherche et au développement de stratégies quantitatives, et plus tard rejoindre une équipe Red Team ou de recherche en sécurité informatique.",
+      "Je suis un étudiant plutôt curieux mais basique, j'apprends la [finance quantitative](glow:finance), la gestion des risques et des actifs. D'autres passions m'animent aussi : le code, les languages bas niveau, la sécurité informatique, la cryptographie et la lecture.",
+      "Le travail auquel j'aspire serait de contribuer à la recherche et au développement de stratégies quantitatives, et plus tard rejoindre une équipe [Red Team](glow:redteam) ou de recherche en sécurité informatique.",
     ],
     bioLong: [
       "Licence économie-gestion à Bayonne, un an de Master corporate finance à Bordeaux, et je finis un Master gestion des risques et des actifs à Paris-Saclay. En chemin : calibration de modèles stochastiques, gestion de portefeuilles, risques extrêmes.",
     ],
     readingBlurb:
-      "En ce moment je lis Shadow Slave (Guiltythree). Ce qui me plaît, c'est la plume de l'auteur : la narration se mêle aux pensées de Sunny, on se croirait dans sa tête.",
-    githubLine: "Tu peux voir ce que je fais sur",
+      "En ce moment je lis [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree). Ce qui me plaît, c'est la plume de l'auteur : la narration se mêle aux pensées de Sunny, on se croirait dans sa tête.",
+    githubLine: "Tu peux voir ce que je fais sur [zixload](github).",
     bioMoreLabel: "show more",
     bioLessLabel: "show less",
     combatSportsBlurb:
-      "J'ai pratiqué la boxe thaï pendant pas mal d'années, et j'ai adoré le côté stratégique et technique. Je regarde aussi beaucoup de MMA, et j'ai hâte que Salahdine Parnasse devienne champion, parce que oui, il le sera à l'UFC.",
+      "J'ai pratiqué la [boxe thaï](pic:gloves) pendant pas mal d'années, et j'ai adoré le côté stratégique et technique. Je regarde aussi beaucoup de MMA, et j'ai hâte que [Salahdine Parnasse](card:parnasse) devienne champion, parce que oui, il le sera à l'UFC.",
     lolBlurb:
-      "Sinon je joue à League of Legends — Master en solo/duo, et même passé Challenger en Flex 5v5 une fois. Pas mon activité principale, mais toujours satisfaisant de grind un peu de ranked.",
+      "Sinon je joue à League of Legends : [Master en solo/duo](card:lol), et même passé Challenger en Flex 5v5 une fois. Pas mon activité principale, mais toujours satisfaisant de grind un peu de ranked.",
     combatSportsCaption: "Avec Salahdine Parnasse",
     currentlyReading: {
       title: "Shadow Slave",
@@ -117,10 +220,10 @@ export const content: Record<Locale, LocaleContent> = {
       label: "En train de lire",
       abstractLabel: "Abstract",
       abstract:
-        "Ayant grandi dans la pauvreté, Sunny attendait peu de choses de la vie. Il n'avait cependant pas prévu d'être choisi par le Sortilège du Cauchemar et de devenir un Éveillé — un groupe d'élite de personnes douées de pouvoirs surnaturels. Transporté dans un monde magique en ruine, il se retrouve confronté à de terribles monstres — et à d'autres Éveillés — dans une lutte mortelle pour la survie. Pire encore, le pouvoir divin qu'il a reçu possède un effet secondaire mineur, mais potentiellement fatal...",
+        "Ayant grandi dans la pauvreté, Sunny attendait peu de choses de la vie. Il n'avait cependant pas prévu d'être choisi par le Sortilège du Cauchemar et de devenir un Éveillé, membre d'un groupe d'élite de personnes douées de pouvoirs surnaturels. Transporté dans un monde magique en ruine, il se retrouve confronté à de terribles monstres, et à d'autres Éveillés, dans une lutte mortelle pour la survie. Pire encore, le pouvoir divin qu'il a reçu possède un effet secondaire mineur, mais potentiellement fatal...",
       quote:
         "Her already prolific fame and exalted status instantly soared as high as the sun. While Nephis slept, her arrival was already creating titanic waves in the mindset of millions of people. In front of the Awakened Academy, a hundred thousand candles continued to burn despite the falling snow. ...And cast by their flames, a hundred thousand shadows danced on the ground.",
-      quoteNote: "Chapitre 766 — Making History",
+      quoteNote: "Chapitre 766 : Making History",
     },
     beliefs: [
       "Un backtest qui marche trop bien est un bug, pas un edge.",
@@ -161,7 +264,7 @@ export const content: Record<Locale, LocaleContent> = {
           "Décomposition de la covariance, prévisions de volatilité et de corrélation pour l'allocation minimum-variance",
         date: "2026-08-14",
         description:
-          "Mémoire M2 — Gestion des Risques et des Actifs (Paris-Saclay) : grille factorielle croisant deux modèles de variance (empirique, GARCH) et trois modèles de corrélation (empirique, shrinkage Ledoit-Wolf, DCC), backtestée sur 281 actions américaines (2005–2025). Le shrinkage de la corrélation réduit systématiquement le risque réalisé du portefeuille minimum-variance ; le GARCH le détériore ; le DCC n'apporte de gain robuste dans aucune configuration.",
+          "Mémoire M2 en Gestion des Risques et des Actifs (Paris-Saclay) : grille factorielle croisant deux modèles de variance (empirique, GARCH) et trois modèles de corrélation (empirique, shrinkage Ledoit-Wolf, DCC), backtestée sur 281 actions américaines (2005–2025). Le shrinkage de la corrélation réduit systématiquement le risque réalisé du portefeuille minimum-variance ; le GARCH le détériore ; le DCC n'apporte de gain robuste dans aucune configuration.",
       },
       {
         slug: "memoire-m1-chocs-geopolitiques",
@@ -169,14 +272,14 @@ export const content: Record<Locale, LocaleContent> = {
           "Réactions différenciées des marchés financiers aux chocs géopolitiques",
         date: "2025-08-01",
         description:
-          "Mémoire M1 — Gestion des Risques et des Actifs (Paris-Saclay) : l'or, le pétrole (WTI) et les indices boursiers (S&P 500, MSCI Asie) face aux chocs géopolitiques 2017–2023, via l'indice GPR (Caldara-Iacoviello) et des modèles VAR / DCC-GARCH. L'or confirme son rôle de valeur refuge ; le pétrole réagit selon la nature du choc.",
+          "Mémoire M1 en Gestion des Risques et des Actifs (Paris-Saclay) : l'or, le pétrole (WTI) et les indices boursiers (S&P 500, MSCI Asie) face aux chocs géopolitiques 2017–2023, via l'indice GPR (Caldara-Iacoviello) et des modèles VAR / DCC-GARCH. L'or confirme son rôle de valeur refuge ; le pétrole réagit selon la nature du choc.",
       },
       {
         slug: "memoire-m1-finance-inegalites",
         title: "Finance et inégalité de revenu : une approche moderne",
         date: "2024-05-01",
         description:
-          "Mémoire M1 — Corporate Finance (IAE Bordeaux) : 136 pays, 1980–2021 — le développement financier suit une relation en U inversé avec les inégalités de revenu (indice FD du FMI), seuil de retournement autour de 0,49. Confirme l'hypothèse de Greenwood et Jovanic (1990).",
+          "Mémoire M1 en Corporate Finance (IAE Bordeaux) : sur 136 pays entre 1980 et 2021, le développement financier suit une relation en U inversé avec les inégalités de revenu (indice FD du FMI), seuil de retournement autour de 0,49. Confirme l'hypothèse de Greenwood et Jovanic (1990).",
       },
     ],
     journal: [
@@ -209,7 +312,7 @@ export const content: Record<Locale, LocaleContent> = {
       journal: {
         title: "Journal",
         description:
-          "Ce que j'apprends au fil du temps — projets de groupe, write-ups HTB/THM, notes de lecture, sans thème fixe.",
+          "Ce que j'apprends au fil du temps : projets de groupe, write-ups HTB/THM, notes de lecture, sans thème fixe.",
       },
       convictions: { title: "Ce que je crois" },
     },
@@ -221,32 +324,32 @@ export const content: Record<Locale, LocaleContent> = {
       { href: "/recherche", label: "Research" },
     ],
     bio: [
-      "I'm a fairly curious but ordinary student, learning quantitative finance, risk and asset management. A few other things keep me busy too: coding, low-level languages, cybersecurity, cryptography, and reading.",
-      "The work I'm aiming for would be contributing to research and development of quantitative strategies, and later joining a Red Team or a security research team.",
+      "I'm a fairly curious but ordinary student, learning [quantitative finance](glow:finance), risk and asset management. A few other things keep me busy too: coding, low-level languages, cybersecurity, cryptography, and reading.",
+      "The work I'm aiming for would be contributing to research and development of quantitative strategies, and later joining a [Red Team](glow:redteam) or a security research team.",
     ],
     bioLong: [
       "Economics-management degree in Bayonne, a year of a Corporate Finance Master's in Bordeaux, and I'm finishing a Risk & Asset Management Master's at Paris-Saclay. Along the way: stochastic model calibration, portfolio management, extreme risk.",
     ],
     readingBlurb:
-      "Right now I'm reading Shadow Slave (Guiltythree). What I like is the author's writing: narration blends into Sunny's thoughts, so it feels like being inside his head.",
-    githubLine: "You can check my work on",
+      "Right now I'm reading [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree). What I like is the author's writing: narration blends into Sunny's thoughts, so it feels like being inside his head.",
+    githubLine: "You can check my work on [zixload](github).",
     bioMoreLabel: "show more",
     bioLessLabel: "show less",
     combatSportsBlurb:
-      "I practiced Muay Thai for quite a few years, and loved the strategic and technical side of it. I also watch a lot of MMA — and I can't wait for Salahdine Parnasse to become champion, because yes, he will be UFC champion.",
+      "I practiced [Muay Thai](pic:gloves) for quite a few years, and loved the strategic and technical side of it. I also watch a lot of MMA, and I can't wait for [Salahdine Parnasse](card:parnasse) to become champion, because yes, he will be UFC champion.",
     combatSportsCaption: "With Salahdine Parnasse",
     lolBlurb:
-      "I also play League of Legends — Master in solo/duo queue, and even hit Challenger in Flex 5v5 once. Not my main thing, but grinding some ranked is always satisfying.",
+      "I also play League of Legends: [Master in solo/duo queue](card:lol), and even hit Challenger in Flex 5v5 once. Not my main thing, but grinding some ranked is always satisfying.",
     currentlyReading: {
       title: "Shadow Slave",
       author: "Guiltythree",
       label: "Currently reading",
       abstractLabel: "Abstract",
       abstract:
-        "Growing up in poverty, Sunny didn't expect much from life. He never imagined being chosen by the Nightmare Spell and becoming an Awakened — a member of an elite group gifted with supernatural powers. Transported into a ruined magical world, he finds himself facing terrible monsters — and other Awakened — in a deadly struggle for survival. Worse still, the divine power he received comes with a minor, but potentially fatal, side effect...",
+        "Growing up in poverty, Sunny didn't expect much from life. He never imagined being chosen by the Nightmare Spell and becoming an Awakened, a member of an elite group gifted with supernatural powers. Transported into a ruined magical world, he finds himself facing terrible monsters, and other Awakened, in a deadly struggle for survival. Worse still, the divine power he received comes with a minor, but potentially fatal, side effect...",
       quote:
         "Her already prolific fame and exalted status instantly soared as high as the sun. While Nephis slept, her arrival was already creating titanic waves in the mindset of millions of people. In front of the Awakened Academy, a hundred thousand candles continued to burn despite the falling snow. ...And cast by their flames, a hundred thousand shadows danced on the ground.",
-      quoteNote: "Chapter 766 — Making History",
+      quoteNote: "Chapter 766: Making History",
     },
     beliefs: [
       "A backtest that works too well is a bug, not an edge.",
@@ -287,21 +390,21 @@ export const content: Record<Locale, LocaleContent> = {
           "Covariance Decomposition: Volatility and Correlation Forecasts for Minimum-Variance Allocation",
         date: "2026-08-14",
         description:
-          "Master's thesis — Risk & Asset Management (Paris-Saclay): a factorial grid crossing two variance models (empirical, GARCH) and three correlation models (empirical, Ledoit-Wolf shrinkage, DCC), backtested on 281 US stocks (2005–2025). Correlation shrinkage systematically reduces realized minimum-variance portfolio risk; GARCH worsens it; DCC brings no robust gain in any configuration.",
+          "Master's thesis in Risk & Asset Management (Paris-Saclay): a factorial grid crossing two variance models (empirical, GARCH) and three correlation models (empirical, Ledoit-Wolf shrinkage, DCC), backtested on 281 US stocks (2005–2025). Correlation shrinkage systematically reduces realized minimum-variance portfolio risk; GARCH worsens it; DCC brings no robust gain in any configuration.",
       },
       {
         slug: "memoire-m1-chocs-geopolitiques",
         title: "Differentiated Market Reactions to Geopolitical Shocks",
         date: "2025-08-01",
         description:
-          "Master's thesis — Risk & Asset Management (Paris-Saclay): gold, oil (WTI) and equity indices (S&P 500, MSCI Asia) facing geopolitical shocks 2017–2023, using the GPR index (Caldara-Iacoviello) and VAR / DCC-GARCH models. Gold confirms its safe-haven role; oil's reaction depends on the nature of the shock.",
+          "Master's thesis in Risk & Asset Management (Paris-Saclay): gold, oil (WTI) and equity indices (S&P 500, MSCI Asia) facing geopolitical shocks 2017–2023, using the GPR index (Caldara-Iacoviello) and VAR / DCC-GARCH models. Gold confirms its safe-haven role; oil's reaction depends on the nature of the shock.",
       },
       {
         slug: "memoire-m1-finance-inegalites",
         title: "Finance and Income Inequality: A Modern Approach",
         date: "2024-05-01",
         description:
-          "Master's thesis — Corporate Finance (IAE Bordeaux): 136 countries, 1980–2021 — financial development follows an inverted-U relationship with income inequality (IMF's FD index), with a turning point around 0.49. Confirms the Greenwood and Jovanic (1990) hypothesis.",
+          "Master's thesis in Corporate Finance (IAE Bordeaux): across 136 countries from 1980 to 2021, financial development follows an inverted-U relationship with income inequality (IMF's FD index), with a turning point around 0.49. Confirms the Greenwood and Jovanic (1990) hypothesis.",
       },
     ],
     journal: [
@@ -334,7 +437,7 @@ export const content: Record<Locale, LocaleContent> = {
       journal: {
         title: "Journal",
         description:
-          "What I learn along the way — group projects, HTB/THM write-ups, reading notes, no fixed theme.",
+          "What I learn along the way: group projects, HTB/THM write-ups, reading notes, no fixed theme.",
       },
       convictions: { title: "What I Believe" },
     },

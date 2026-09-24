@@ -4,8 +4,9 @@ import { Nav } from "@/components/nav";
 import { SidebarVisual } from "@/components/sidebar-visual";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { SoundEffects } from "@/components/sound-effects";
+import { VinylPlayer } from "@/components/vinyl-player";
 import { LocaleProvider } from "@/lib/locale-context";
-import { content, showSidebarVisual, site } from "@/lib/content";
+import { content, music, showSidebarVisual, site } from "@/lib/content";
 import "./globals.css";
 
 const inter = Inter({
@@ -35,6 +36,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SmoothScroll />
           <SoundEffects />
           <Nav />
+          {/* Platine centrée dans la marge gauche, dans le layout et non dans
+              une page : la musique continue quand on change d'onglet. Le
+              conteneur externe la place, l'interne la réduit — `zoom` agrandit
+              ou réduit aussi les décalages de l'élément qui le porte, on ne
+              peut donc pas faire les deux au même endroit. */}
+          <div className="vinyl-dock hidden xl:block">
+            <div className="vinyl-dock__scale">
+              <VinylPlayer tracks={music} />
+            </div>
+          </div>
           {/* Colonne unique centrée : la vidéo est passée sous le contenu,
               à la même largeur que le texte, et reste présente sur toutes les
               pages. */}

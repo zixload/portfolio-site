@@ -4,19 +4,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BioTabs } from "@/components/bio-tabs";
 import { EntryThumb } from "@/components/entry-thumb";
-import { ExpandableImage } from "@/components/expandable-image";
-import { GithubIcon } from "@/components/github-icon";
 import { Interests } from "@/components/interests";
-import { PhotoStack } from "@/components/photo-stack";
-import { ReadingCard } from "@/components/reading-card";
-import { RevealBlock, RevealChars } from "@/components/reveal-text";
+import { RichText } from "@/components/rich-text";
 import { SlidingHighlight } from "@/components/sliding-highlight";
 import { WipBadge } from "@/components/wip-badge";
 import { formatDate } from "@/lib/format";
-import { links, media, showLongBio } from "@/lib/content";
+import { showLongBio } from "@/lib/content";
 import { useContent, useLocale } from "@/lib/locale-context";
-
-const github = links.find((link) => link.label === "GitHub");
 
 export default function Home() {
   const c = useContent();
@@ -31,66 +25,19 @@ export default function Home() {
           <div style={{ animation: "fadeUp 0.7s ease-out 180ms both" }}>
             <BioTabs
               short={c.bio}
-              extra={c.bioLong}
+              extra={[
+                ...c.bioLong,
+                c.readingBlurb,
+                c.combatSportsBlurb,
+                c.lolBlurb,
+              ]}
               moreLabel={c.bioMoreLabel}
               lessLabel={c.bioLessLabel}
               expandable={showLongBio}
               footer={
-                github && (
-                  <p className="max-w-xl leading-relaxed text-zinc-700 dark:text-zinc-300">
-                    {c.githubLine}{" "}
-                    <a
-                      href={github.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-baseline gap-1.5 underline decoration-dotted decoration-zinc-300 underline-offset-4 transition-colors hover:text-[var(--accent)]"
-                    >
-                      <GithubIcon className="h-4 w-4 self-center" />
-                      GitHub
-                    </a>
-                    .
-                  </p>
-                )
-              }
-              longExtra={
-                <>
-                  <div className="flex items-start gap-4">
-                    <p className="min-w-0 flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
-                      <RevealChars text={c.readingBlurb} order={4} />
-                    </p>
-                    <RevealBlock order={4} className="shrink-0">
-                      <ReadingCard compact />
-                    </RevealBlock>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <p className="min-w-0 flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
-                      <RevealChars text={c.combatSportsBlurb} order={5} />
-                    </p>
-                    <RevealBlock order={5} className="shrink-0">
-                      <ExpandableImage
-                        src={media.combatSportsPhoto}
-                        alt={c.combatSportsCaption}
-                        width={828}
-                        height={1472}
-                        className="h-32 w-24 rotate-[1.7deg] rounded-sm shadow-sm"
-                        hoverClassName="hover:scale-[1.03] hover:-rotate-[0.8deg]"
-                      />
-                    </RevealBlock>
-                  </div>
-                  <div className="flex gap-4">
-                    <p className="flex-1 leading-relaxed text-zinc-700 dark:text-zinc-300">
-                      <RevealChars text={c.lolBlurb} order={6} />
-                    </p>
-                    <RevealBlock order={6}>
-                      <PhotoStack
-                        images={media.lolScreens.map((src, i) => ({
-                          src,
-                          alt: `Rank up screenshot ${i + 1}`,
-                        }))}
-                      />
-                    </RevealBlock>
-                  </div>
-                </>
+                <p className="max-w-xl leading-relaxed text-zinc-700 dark:text-zinc-300">
+                  <RichText text={c.githubLine} />
+                </p>
               }
             />
           </div>
@@ -169,6 +116,7 @@ export default function Home() {
             items={c.interests.items}
           />
         </section>
+
     </div>
   );
 }

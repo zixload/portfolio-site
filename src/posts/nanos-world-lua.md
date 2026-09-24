@@ -20,7 +20,7 @@ un invité. Il est appelé par le moteur, pas l'inverse.
 Ce qui m'a demandé le plus de temps à intégrer, c'est que tout part
 d'événements. On ne pilote pas le serveur, on réagit : un joueur se connecte,
 un objet est détruit, un tick s'écoule. Chaque callback s'exécute dans la boucle
-du serveur — donc **tout ce qui traîne dans un callback retarde le reste**.
+du serveur, donc **tout ce qui traîne dans un callback retarde le reste**.
 
 D'où la règle que je m'impose pour l'instant : rien de lourd dans un handler
 appelé à chaque tick. Le travail coûteux se calcule une fois, se met en cache,

@@ -2,17 +2,15 @@
 
 import { useState, type ReactNode } from "react";
 import { LocaleToggle } from "@/components/locale-toggle";
-import { RevealChars, RevealScope } from "@/components/reveal-text";
+import { RichText } from "@/components/rich-text";
 
 /**
  * Bio courte toujours montée, à laquelle on ajoute la suite au clic. Les
- * paragraphes déjà lus ne sont ni remontés ni ré-animés : seul le contenu
- * nouveau se révèle, et la page pousse simplement vers le bas.
+ * paragraphes déjà lus ne sont pas remontés : la suite s'ajoute en dessous.
  */
 export function BioTabs({
   short,
   extra,
-  longExtra,
   footer,
   moreLabel,
   lessLabel,
@@ -20,7 +18,6 @@ export function BioTabs({
 }: {
   short: string[];
   extra: string[]; // paragraphes ajoutés au dépliage, pas la bio complète
-  longExtra?: ReactNode;
   footer?: ReactNode; // ligne de fin commune aux deux états (le lien GitHub)
   moreLabel: string;
   lessLabel: string;
@@ -40,25 +37,21 @@ export function BioTabs({
         {short.map((paragraph) => (
           <p
             key={paragraph}
-            className="max-w-xl leading-relaxed text-zinc-700 dark:text-zinc-300"
+            className="relative max-w-xl text-justify leading-relaxed text-zinc-700 dark:text-zinc-300"
           >
-            {paragraph}
+            <RichText text={paragraph} />
           </p>
         ))}
 
-        {showExtra && (
-          <RevealScope revealed className="flex flex-col gap-4">
-            {extra.map((paragraph, index) => (
-              <p
-                key={paragraph}
-                className="max-w-xl leading-relaxed text-zinc-700 dark:text-zinc-300"
-              >
-                <RevealChars text={paragraph} order={index} />
-              </p>
-            ))}
-            {longExtra}
-          </RevealScope>
-        )}
+        {showExtra &&
+          extra.map((paragraph) => (
+            <p
+              key={paragraph}
+              className="relative max-w-xl text-justify leading-relaxed text-zinc-700 dark:text-zinc-300"
+            >
+              <RichText text={paragraph} />
+            </p>
+          ))}
       </div>
 
       {footer}

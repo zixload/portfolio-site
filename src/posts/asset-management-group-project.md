@@ -14,7 +14,7 @@ $$
 
 et sa faiblesse est connue : $\Sigma$ estimée empiriquement est bruitée, et
 l'optimiseur se précipite sur ce bruit. Le shrinkage de Ledoit-Wolf tire la matrice
-vers une cible structurée, ce qui suffit à réduire nettement le risque réalisé — sans
+vers une cible structurée, ce qui suffit à réduire nettement le risque réalisé, sans
 rien changer à l'optimisation elle-même.
 
 ## Vues Machine Learning

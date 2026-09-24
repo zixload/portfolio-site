@@ -43,3 +43,9 @@ next-env.d.ts
 # AI agent tooling files (regenerated locally, kept out of the repo)
 CLAUDE.md
 AGENTS.md
+
+# sources 3D lourdes : seuls les scripts de rendu et les images finales sont suivis
+/art/3d/*.blend
+/art/3d/*.blend1
+/art/3d/gloves/
+/art/3d/renders/

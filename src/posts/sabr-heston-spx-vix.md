@@ -1,8 +1,8 @@
 # Calibration of SABR and Heston Models on SPX and VIX Options
 
 Projet de groupe à l'ENSIIE. L'idée de départ était simple : deux modèles de
-volatilité stochastique très utilisés, deux marchés d'options liés — le SPX et le
-VIX — et une question, est-ce qu'un même jeu de paramètres peut tenir sur les deux
+volatilité stochastique très utilisés, deux marchés d'options liés, le SPX et le
+VIX, et une question : est-ce qu'un même jeu de paramètres peut tenir sur les deux
 à la fois ?
 
 ## Les deux modèles
@@ -25,8 +25,8 @@ structure par terme que SABR n'a pas.
 
 ## Ce qu'on trouve
 
-En calibration séparée, SABR colle remarquablement bien au SPX — RMSE de 0,43 point
-de volatilité — mais s'effondre sur le VIX, à 117 points. Sans rappel vers la moyenne,
+En calibration séparée, SABR colle remarquablement bien au SPX (RMSE de 0,43 point
+de volatilité), mais s'effondre sur le VIX, à 117 points. Sans rappel vers la moyenne,
 impossible de reproduire la forme très particulière du smile du VIX.
 
 En calibration jointe, on force un seul jeu de paramètres à expliquer les deux
