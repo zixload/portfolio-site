@@ -23,7 +23,7 @@ import { cards, glows, links, objects, pics } from "@/lib/content";
  *   [zixload](github)                 pastille vers le profil GitHub
  *   [Shadow Slave](obj:weaver)        objet 3D à côté du paragraphe
  *                                     (voir `objects`)
- *   [Red Team](glow:redteam)          mot en gras et son icône, qui
+ *   [mot](glow:security)              mot en gras et son icône, qui
  *                                     s'allument au survol (voir `glows`)
  *   [boxe thaï](pic:gloves)           petite image collée au mot, à hauteur
  *                                     de texte (voir `pics`)
@@ -138,19 +138,12 @@ const GLOW_ICONS = {
       <path d="M14.5 5.2h7.3a1 1 0 0 1 1 1v7.3a1 1 0 0 1-1.7.7l-7.3-7.3a1 1 0 0 1 .7-1.7Z" />
     </>
   ),
-  // Réticule : un anneau, quatre repères et le point visé.
-  crosshair: (
-    <>
-      <path
-        fillRule="evenodd"
-        d="M12 3.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17Zm0 2.6a5.9 5.9 0 1 0 0 11.8 5.9 5.9 0 0 0 0-11.8Z"
-      />
-      <rect x="10.8" y="0.5" width="2.4" height="6" rx="1.2" />
-      <rect x="10.8" y="17.5" width="2.4" height="6" rx="1.2" />
-      <rect x="0.5" y="10.8" width="6" height="2.4" rx="1.2" />
-      <rect x="17.5" y="10.8" width="6" height="2.4" rx="1.2" />
-      <circle cx="12" cy="12" r="2.2" />
-    </>
+  // Bouclier percé d'une serrure.
+  shield: (
+    <path
+      fillRule="evenodd"
+      d="M12 1.5 3.5 5v6.3c0 5.3 3.6 9.6 8.5 11.2 4.9-1.6 8.5-5.9 8.5-11.2V5L12 1.5Zm0 6.2a2.4 2.4 0 0 0-1.2 4.5l-.7 4.3h3.8l-.7-4.3A2.4 2.4 0 0 0 12 7.7Z"
+    />
   ),
 };
 

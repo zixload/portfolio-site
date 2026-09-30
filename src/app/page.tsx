@@ -4,8 +4,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BioTabs } from "@/components/bio-tabs";
 import { EntryThumb } from "@/components/entry-thumb";
-import { Interests } from "@/components/interests";
-import { RichText } from "@/components/rich-text";
 import { SlidingHighlight } from "@/components/sliding-highlight";
 import { WipBadge } from "@/components/wip-badge";
 import { formatDate } from "@/lib/format";
@@ -25,20 +23,10 @@ export default function Home() {
           <div style={{ animation: "fadeUp 0.7s ease-out 180ms both" }}>
             <BioTabs
               short={c.bio}
-              extra={[
-                ...c.bioLong,
-                c.readingBlurb,
-                c.combatSportsBlurb,
-                c.lolBlurb,
-              ]}
+              extra={c.bioLong}
               moreLabel={c.bioMoreLabel}
               lessLabel={c.bioLessLabel}
               expandable={showLongBio}
-              footer={
-                <p className="max-w-xl leading-relaxed text-zinc-700 dark:text-zinc-300">
-                  <RichText text={c.githubLine} />
-                </p>
-              }
             />
           </div>
         </section>
@@ -51,7 +39,7 @@ export default function Home() {
           <h2 className="border-b border-zinc-200 pb-2 text-sm font-normal text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
             {c.blogsHeading}
           </h2>
-          <SlidingHighlight className="flex flex-col">
+          <SlidingHighlight className="blog-focus flex flex-col">
             {recent.map((entry) => {
               const rowClassName =
                 "entry-row group flex flex-1 items-center justify-between gap-6";
@@ -101,20 +89,13 @@ export default function Home() {
               return (
                 <div
                   key={entry.slug}
-                  className="flex items-center gap-2 py-3"
+                  className="blog-focus__item flex items-center gap-2 py-3"
                 >
                   {link}
                 </div>
               );
             })}
           </SlidingHighlight>
-        </section>
-
-        <section style={{ animation: "fadeUp 0.7s ease-out 450ms both" }}>
-          <Interests
-            heading={c.interests.heading}
-            items={c.interests.items}
-          />
         </section>
 
     </div>

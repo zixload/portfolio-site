@@ -3,6 +3,8 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import { SlideCarousel } from "@/components/slide-carousel";
+import { carousels } from "@/lib/content";
 
 export function Markdown({ source }: { source: string }) {
   return (
@@ -63,6 +65,48 @@ export function Markdown({ source }: { source: string }) {
             <pre className="overflow-x-auto rounded-sm bg-zinc-100 p-4 font-mono text-sm text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
               {children}
             </pre>
+          ),
+          // Image d'article avec sa légende (le titre markdown). En spans : le
+          // markdown la place dans un <p>, où une <figure> serait invalide.
+          // Un .mp4 devient une vidéo muette en boucle, avec son image
+          // d'attente « -poster.jpg » à côté ; les commandes rendent le son.
+          // Un dossier déclaré dans `carousels` devient un carrousel.
+          img: ({ src, alt, title }) => (
+            <span className="my-2 flex flex-col gap-2">
+              {typeof src === "string" && carousels[src] ? (
+                <SlideCarousel
+                  dir={src}
+                  count={carousels[src]}
+                  label={alt ?? "Diapositives"}
+                />
+              ) : typeof src === "string" && src.endsWith(".mp4") ? (
+                <video
+                  src={src}
+                  poster={src.replace(/\.mp4$/, "-poster.jpg")}
+                  aria-label={alt ?? undefined}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  preload="metadata"
+                  className="w-full rounded-lg border border-zinc-200 shadow-[0_8px_24px_rgb(0_0_0/0.06)]"
+                />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={typeof src === "string" ? src : undefined}
+                  alt={alt ?? ""}
+                  loading="lazy"
+                  className="w-full rounded-lg border border-zinc-200 shadow-[0_8px_24px_rgb(0_0_0/0.06)]"
+                />
+              )}
+              {title && (
+                <span className="text-center text-xs text-zinc-400">
+                  {title}
+                </span>
+              )}
+            </span>
           ),
           hr: () => (
             <hr className="border-zinc-200 dark:border-zinc-800" />

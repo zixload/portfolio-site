@@ -2,7 +2,7 @@
 // Le timbre vient d'un sinus très grave passé dans un lowpass : on obtient un
 // "toc" feutré plutôt qu'un bip d'interface.
 
-const MIN_INTERVAL_MS = 35; // anti-mitraillette quand la souris balaie la page
+const MIN_INTERVAL_MS = 35; // anti-mitraillette sur les clics rapprochés
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
@@ -79,51 +79,39 @@ function playTone(frequency: number, options: ToneOptions = {}) {
   osc.stop(start + duration + 0.03);
 }
 
-export function playHover() {
+export function playClick() {
   playTone(220, { gain: 0.045, duration: 0.085, filter: 640 });
 }
 
 /**
- * Écouteurs délégués sur le document : tout `<a>` / `<button>` sonne, sans avoir
- * à instrumenter chaque composant. Retourne la fonction de nettoyage.
+ * Écouteur délégué sur le document : tout `<a>` / `<button>` sonne au clic,
+ * sans avoir à instrumenter chaque composant. Retourne la fonction de
+ * nettoyage.
  */
 export function initSound() {
   const selector = "a, button, [data-sound]";
-  let hovered: Element | null = null;
 
-  const onPointerOver = (event: PointerEvent) => {
+  // Le clic est aussi le geste qui autorise l'audio : au tout premier, le
+  // contexte démarre à peine, on attend qu'il tourne pour jouer le son.
+  const onPointerDown = (event: PointerEvent) => {
+    const audio = ensureContext();
     const target = (event.target as Element | null)?.closest?.(selector);
-    if (!target || target === hovered) return;
-    hovered = target;
-    playHover();
-  };
-
-  const onPointerOut = (event: PointerEvent) => {
-    if (!hovered) return;
-    const next = event.relatedTarget as Node | null;
-    if (!next || !hovered.contains(next)) hovered = null;
-  };
-
-  // Seuls ces gestes réveillent l'audio (le survol n'en fait pas partie, c'est
-  // une règle du navigateur). On écoute jusqu'à ce que le contexte tourne
-  // vraiment : un `resume()` peut échouer, et un `{ once: true }` aurait retiré
-  // l'écouteur en laissant le son muet pour toute la session.
-  const GESTURES = ["pointerdown", "pointerup", "keydown", "touchend"] as const;
-
-  const tryUnlock = () => {
-    unlock();
-    if (ctx?.state === "running") {
-      GESTURES.forEach((type) => document.removeEventListener(type, tryUnlock));
+    if (!audio || !target) {
+      unlock();
+      return;
     }
+    if (audio.state === "running") playClick();
+    else void audio.resume().then(playClick);
   };
 
-  document.addEventListener("pointerover", onPointerOver);
-  document.addEventListener("pointerout", onPointerOut);
-  GESTURES.forEach((type) => document.addEventListener(type, tryUnlock));
+  // Le clavier réveille aussi l'audio, sans jouer de son.
+  const onKeyDown = () => unlock();
+
+  document.addEventListener("pointerdown", onPointerDown);
+  document.addEventListener("keydown", onKeyDown);
 
   return () => {
-    document.removeEventListener("pointerover", onPointerOver);
-    document.removeEventListener("pointerout", onPointerOut);
-    GESTURES.forEach((type) => document.removeEventListener(type, tryUnlock));
+    document.removeEventListener("pointerdown", onPointerDown);
+    document.removeEventListener("keydown", onKeyDown);
   };
 }

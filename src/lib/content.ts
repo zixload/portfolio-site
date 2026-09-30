@@ -20,8 +20,11 @@ export const showLongBio = true;
 // petite pour la largeur actuelle. À remettre à `true` avec un rendu plus large.
 export const showSidebarVisual = false;
 
-export const links = [
-  { label: "GitHub", href: "https://github.com/zixload" },
+// Réseaux affichés en bas de chaque page. `icon` choisit
+// le dessin dans site-footer.tsx.
+export const links: { label: string; href: string; icon: "github" | "x" }[] = [
+  { label: "GitHub", href: "https://github.com/zixload", icon: "github" },
+  { label: "X", href: "https://x.com/zixload", icon: "x" },
 ];
 
 export type Entry = {
@@ -33,13 +36,6 @@ export type Entry = {
   post?: boolean; // true = page interne /blog/{slug} (Markdown), rendu via src/posts/{slug}.md
   image?: string; // vignette illustrant l'entrée, ex. "/media/writing/mon-post.png"
   wip?: boolean; // article encore en cours d'écriture : affiche la pastille "writing…"
-};
-
-// Terme survolable dans la ligne des centres d'intérêt : au survol, ses images
-// se déploient en petites cartes au-dessus du mot.
-export type Interest = {
-  label: string;
-  images: string[];
 };
 
 // Images partagées entre les deux langues.
@@ -113,10 +109,16 @@ export const objects: Record<
 // icônes sont dessinées dans rich-text.tsx.
 export const glows: Record<
   string,
-  { icon: "trend" | "crosshair"; color: string }
+  { icon: "trend" | "shield"; color: string }
 > = {
   finance: { icon: "trend", color: "#4f46e5" },
-  redteam: { icon: "crosshair", color: "#e11d48" },
+  security: { icon: "shield", color: "#2563eb" },
+};
+
+// Dossiers d'images affichés en carrousel dans les articles, avec leur nombre
+// d'images (01.webp, 02.webp…). Dans le markdown : ![légende](/dossier/).
+export const carousels: Record<string, number> = {
+  "/media/writing/soutenance/": 24,
 };
 
 // Petites images collées au mot, à hauteur de texte (voir RichText, attribut
@@ -157,19 +159,21 @@ export const music = [
     cover: "/media/music/in-love-with-life-cover.jpg",
     src: "/media/music/in-love-with-life.mp3",
   },
+  {
+    title: "Echoes",
+    artist: "Olexandr Ignatov",
+    cover: "/media/music/echoes-cover.jpg",
+    src: "/media/music/echoes.mp3",
+  },
 ];
 
 type LocaleContent = {
   nav: { href: string; label: string }[];
   bio: string[];
-  bioLong: string[];
-  readingBlurb: string; // paragraphe lecture, affiché à côté de la carte du livre
-  githubLine: string; // phrase qui introduit le lien GitHub, dans la bio
+  bioLong: string[]; // paragraphes ajoutés par « show more »
   bioMoreLabel: string; // déplie la bio longue
   bioLessLabel: string; // la referme
-  combatSportsBlurb: string;
   combatSportsCaption: string;
-  lolBlurb: string;
   currentlyReading: {
     title: string;
     author: string;
@@ -180,13 +184,13 @@ type LocaleContent = {
     quoteNote: string;
   };
   beliefs: string[];
-  interests: { heading: string; items: Interest[] };
   research: Entry[];
   journal: Entry[];
   pages: {
     recherche: { title: string; description: string };
     journal: { title: string; description: string };
     convictions: { title: string };
+    notFound: { title: string; description: string; back: string };
   };
   blogsHeading: string;
 };
@@ -199,20 +203,13 @@ export const content: Record<Locale, LocaleContent> = {
     ],
     bio: [
       "Je suis un étudiant plutôt curieux mais basique, j'apprends la [finance quantitative](glow:finance), la gestion des risques et des actifs. D'autres passions m'animent aussi : le code, les languages bas niveau, la sécurité informatique, la cryptographie et la lecture.",
-      "Le travail auquel j'aspire serait de contribuer à la recherche et au développement de stratégies quantitatives, et plus tard rejoindre une équipe [Red Team](glow:redteam) ou de recherche en sécurité informatique.",
+      "Le travail auquel j'aspire serait de contribuer à la recherche et au développement de stratégies quantitatives, et plus tard rejoindre une [équipe de recherche en sécurité informatique](glow:security).",
     ],
     bioLong: [
-      "Licence économie-gestion à Bayonne, un an de Master corporate finance à Bordeaux, et je finis un Master gestion des risques et des actifs à Paris-Saclay. En chemin : calibration de modèles stochastiques, gestion de portefeuilles, risques extrêmes.",
+      "En ce moment je lis [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree), pour sa plume : on se croirait dans la tête de Sunny. J'ai fait de la [boxe thaï](pic:gloves) pendant des années et je suis beaucoup le MMA ; [Salahdine Parnasse](card:parnasse) sera champion UFC, j'en suis sûr. Et je joue à League of Legends : [Master en solo/duo](card:lol), Challenger une fois en Flex.",
     ],
-    readingBlurb:
-      "En ce moment je lis [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree). Ce qui me plaît, c'est la plume de l'auteur : la narration se mêle aux pensées de Sunny, on se croirait dans sa tête.",
-    githubLine: "Tu peux voir ce que je fais sur [zixload](github).",
     bioMoreLabel: "show more",
     bioLessLabel: "show less",
-    combatSportsBlurb:
-      "J'ai pratiqué la [boxe thaï](pic:gloves) pendant pas mal d'années, et j'ai adoré le côté stratégique et technique. Je regarde aussi beaucoup de MMA, et j'ai hâte que [Salahdine Parnasse](card:parnasse) devienne champion, parce que oui, il le sera à l'UFC.",
-    lolBlurb:
-      "Sinon je joue à League of Legends : [Master en solo/duo](card:lol), et même passé Challenger en Flex 5v5 une fois. Pas mon activité principale, mais toujours satisfaisant de grind un peu de ranked.",
     combatSportsCaption: "Avec Salahdine Parnasse",
     currentlyReading: {
       title: "Shadow Slave",
@@ -242,20 +239,6 @@ export const content: Record<Locale, LocaleContent> = {
       "Écrire clairement force à penser clairement.",
       "Douter de ses propres résultats avant de les défendre.",
     ],
-    interests: {
-      heading: "Centres d'intérêt",
-      items: [
-        { label: "boxe thaï", images: [media.combatSportsPhoto] },
-        { label: "league of legends", images: media.lolScreens.slice(0, 3) },
-        {
-          label: "webnovels",
-          images: [
-            media.currentlyReadingCover,
-            media.currentlyReadingIllustration,
-          ],
-        },
-      ],
-    },
     research: [
       ...managedEntries("fr", "research"),
       {
@@ -284,6 +267,15 @@ export const content: Record<Locale, LocaleContent> = {
     ],
     journal: [
       ...managedEntries("fr", "journal"),
+      {
+        slug: "apprendre-avec-ia",
+        title: "Apprendre et s'entraîner avec l'IA",
+        date: "2026-09-30",
+        description:
+          "Mes cours et mon mémoire transformés en vidéos Manim calées phrase par phrase sur ma voix, et mes répétitions d'oral transcrites puis corrigées point par point par Claude.",
+        post: true,
+        image: "/media/writing/apprendre-avec-ia-coureur.jpg",
+      },
       {
         slug: "sabr-heston-spx-vix",
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
@@ -315,6 +307,11 @@ export const content: Record<Locale, LocaleContent> = {
           "Ce que j'apprends au fil du temps : projets de groupe, write-ups HTB/THM, notes de lecture, sans thème fixe.",
       },
       convictions: { title: "Ce que je crois" },
+      notFound: {
+        title: "Le saphir a sauté.",
+        description: "Cette page n'existe pas, ou plus.",
+        back: "Retour à l'accueil",
+      },
     },
     blogsHeading: "Blogs",
   },
@@ -325,21 +322,14 @@ export const content: Record<Locale, LocaleContent> = {
     ],
     bio: [
       "I'm a fairly curious but ordinary student, learning [quantitative finance](glow:finance), risk and asset management. A few other things keep me busy too: coding, low-level languages, cybersecurity, cryptography, and reading.",
-      "The work I'm aiming for would be contributing to research and development of quantitative strategies, and later joining a [Red Team](glow:redteam) or a security research team.",
+      "The work I'm aiming for would be contributing to research and development of quantitative strategies, and later joining a [security research team](glow:security).",
     ],
     bioLong: [
-      "Economics-management degree in Bayonne, a year of a Corporate Finance Master's in Bordeaux, and I'm finishing a Risk & Asset Management Master's at Paris-Saclay. Along the way: stochastic model calibration, portfolio management, extreme risk.",
+      "Right now I'm reading [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree), for the writing: it feels like being inside Sunny's head. I did [Muay Thai](pic:gloves) for years and follow MMA closely; [Salahdine Parnasse](card:parnasse) will be UFC champion, I'm sure of it. And I play League of Legends: [Master in solo/duo](card:lol), Challenger once in Flex.",
     ],
-    readingBlurb:
-      "Right now I'm reading [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree). What I like is the author's writing: narration blends into Sunny's thoughts, so it feels like being inside his head.",
-    githubLine: "You can check my work on [zixload](github).",
     bioMoreLabel: "show more",
     bioLessLabel: "show less",
-    combatSportsBlurb:
-      "I practiced [Muay Thai](pic:gloves) for quite a few years, and loved the strategic and technical side of it. I also watch a lot of MMA, and I can't wait for [Salahdine Parnasse](card:parnasse) to become champion, because yes, he will be UFC champion.",
     combatSportsCaption: "With Salahdine Parnasse",
-    lolBlurb:
-      "I also play League of Legends: [Master in solo/duo queue](card:lol), and even hit Challenger in Flex 5v5 once. Not my main thing, but grinding some ranked is always satisfying.",
     currentlyReading: {
       title: "Shadow Slave",
       author: "Guiltythree",
@@ -368,20 +358,6 @@ export const content: Record<Locale, LocaleContent> = {
       "Writing clearly forces you to think clearly.",
       "Doubt your own results before you defend them.",
     ],
-    interests: {
-      heading: "Interests",
-      items: [
-        { label: "muay thai", images: [media.combatSportsPhoto] },
-        { label: "league of legends", images: media.lolScreens.slice(0, 3) },
-        {
-          label: "webnovels",
-          images: [
-            media.currentlyReadingCover,
-            media.currentlyReadingIllustration,
-          ],
-        },
-      ],
-    },
     research: [
       ...managedEntries("en", "research"),
       {
@@ -409,6 +385,15 @@ export const content: Record<Locale, LocaleContent> = {
     ],
     journal: [
       ...managedEntries("en", "journal"),
+      {
+        slug: "apprendre-avec-ia",
+        title: "Learning and practising with AI",
+        date: "2026-09-30",
+        description:
+          "My courses and thesis turned into Manim videos synced sentence by sentence to my voice, and my defense rehearsals transcribed, then corrected point by point by Claude.",
+        post: true,
+        image: "/media/writing/apprendre-avec-ia-coureur.jpg",
+      },
       {
         slug: "sabr-heston-spx-vix",
         title: "Calibration of SABR and Heston Models on SPX and VIX Options",
@@ -440,6 +425,11 @@ export const content: Record<Locale, LocaleContent> = {
           "What I learn along the way: group projects, HTB/THM write-ups, reading notes, no fixed theme.",
       },
       convictions: { title: "What I Believe" },
+      notFound: {
+        title: "The needle skipped.",
+        description: "This page doesn't exist, or no longer does.",
+        back: "Back home",
+      },
     },
     blogsHeading: "Blogs",
   },

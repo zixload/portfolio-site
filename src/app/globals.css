@@ -959,13 +959,14 @@ a {
    passe au-dessus du disque, en lecture il pivote de 21° et sa pointe se pose
    sur les sillons, entre l'étiquette et le bord.
    ------------------------------------------------------------------------ */
+/* Taille fixe : la carte ne bouge pas d'un pixel quand le morceau change,
+   quelle que soit la longueur du titre. */
 .vinyl {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.5rem 1.75rem;
-  width: fit-content;
-  max-width: 100%;
+  gap: 1.75rem;
+  width: 504px;
   padding: 1.25rem 2.5rem 1.25rem 1rem;
   border-radius: 28px;
   background: #f2f2f2;
@@ -1134,7 +1135,8 @@ a {
 
 .vinyl__info {
   display: flex;
-  min-width: 0;
+  flex: none;
+  width: 180px;
   flex-direction: column;
 }
 
@@ -1144,19 +1146,30 @@ a {
   font-weight: 500;
 }
 
+/* Le titre réserve toujours deux lignes : long, il passe à la ligne sans
+   changer la hauteur ; au-delà, il est coupé par des points de suspension. */
 .vinyl__title {
+  display: -webkit-box;
+  height: calc(2 * 1.08em);
   margin-top: 2px;
+  overflow: hidden;
   color: #111;
   font-size: 28px;
   font-weight: 500;
   letter-spacing: -0.025em;
   line-height: 1.08;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .vinyl__artist {
   margin-top: 4px;
+  overflow: hidden;
   color: #9b9b9b;
   font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .vinyl__controls {
@@ -1509,6 +1522,188 @@ p:hover .glow {
 p:hover .glow__icon {
   transform: rotate(-8deg) scale(1.15);
   filter: drop-shadow(0 0 5px color-mix(in srgb, var(--glow) 45%, transparent));
+}
+
+/* 404 : le zéro est un disque, mêmes sillons que la platine. Il tourne, puis
+   recule d'un coup de temps en temps, comme un saphir qui saute. */
+.disc404 {
+  position: relative;
+  display: inline-block;
+  width: 0.72em;
+  height: 0.72em;
+  margin: 0 0.04em;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle,
+    #f7f7f7 0 0.75px,
+    #e4e4e4 0.75px 1.5px
+  );
+  box-shadow:
+    0 10px 24px rgb(0 0 0 / 14%),
+    inset 0 0 0 1px rgb(0 0 0 / 5%);
+  animation: disc404Skip 5s linear infinite;
+}
+
+.disc404__label {
+  position: absolute;
+  inset: 32%;
+  border-radius: 50%;
+  background: conic-gradient(from 20deg, #18181b 0 70%, #3f3f46 70% 78%, #18181b 78%);
+}
+
+.disc404__label::after {
+  content: "";
+  position: absolute;
+  inset: 42%;
+  border-radius: 50%;
+  background: #f4f4f5;
+}
+
+@keyframes disc404Skip {
+  0% {
+    transform: rotate(0deg);
+  }
+  70% {
+    transform: rotate(504deg);
+  }
+  72% {
+    transform: rotate(470deg);
+  }
+  100% {
+    transform: rotate(720deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc404 {
+    animation: none;
+  }
+}
+
+/* Carrousel de diapositives dans les articles. */
+.slide-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  outline: none;
+}
+
+.slide-carousel__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 6%);
+}
+
+.slide-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide-carousel__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  aspect-ratio: 1399 / 875;
+  scroll-snap-align: start;
+  background: #fff;
+}
+
+.slide-carousel__bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.slide-carousel__count {
+  min-width: 3.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: #71717a;
+}
+
+.slide-carousel__button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 12%),
+    inset 0 0 0 1px rgb(0 0 0 / 5%);
+  color: #3f3f46;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+.slide-carousel__button:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+.slide-carousel__button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.slide-carousel__button svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.slide-carousel:focus-visible .slide-carousel__track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Bas de page : les réseaux, centrés, discrets. */
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 2rem 1.5rem 3.5rem;
+}
+
+.site-footer__links {
+  display: flex;
+  gap: 1.1rem;
+}
+
+.site-footer__link {
+  display: block;
+  color: #a1a1aa;
+  transition:
+    color 200ms ease,
+    transform 200ms ease;
+}
+
+.site-footer__link:hover,
+.site-footer__link:focus-visible {
+  color: #27272a;
+  transform: translateY(-2px);
+}
+
+/* Liste des blogs : au survol d'un article, les autres se floutent et
+   s'estompent, pour que celui visé ressorte (repris de ramx.in). */
+.blog-focus__item {
+  transition:
+    filter 300ms ease,
+    opacity 300ms ease;
+}
+
+.blog-focus:has(.blog-focus__item:hover) .blog-focus__item:not(:hover) {
+  filter: blur(2px);
+  opacity: 0.4;
 }
 
 /* The dragon shares the persistent layout with the record player. */

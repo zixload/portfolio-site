@@ -151,6 +151,9 @@ export function VinylPlayer({ tracks }: { tracks: Track[] }) {
                 alt=""
                 width={160}
                 height={160}
+                // Souvent le plus grand élément à l'écran (LCP) : pas de
+                // chargement différé.
+                loading="eager"
                 className="vinyl__cover"
               />
             </div>

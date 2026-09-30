@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/nav";
+import { SiteFooter } from "@/components/site-footer";
 import { SidebarVisual } from "@/components/sidebar-visual";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { SoundEffects } from "@/components/sound-effects";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </div>
             )}
           </main>
+          <SiteFooter />
           <DragonCompanion />
         </LocaleProvider>
       </body>
