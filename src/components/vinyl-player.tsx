@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { VINYL_ACTIVITY_EVENT } from "@/lib/companion-events";
 
 export type Track = {
   title: string;
@@ -119,6 +120,7 @@ export function VinylPlayer({ tracks }: { tracks: Track[] }) {
 
   const go = useCallback(
     (step: number) => {
+      if (tracks.length > 1) window.dispatchEvent(new Event(VINYL_ACTIVITY_EVENT));
       setIndex((i) => (i + step + tracks.length) % tracks.length);
     },
     [tracks.length]
@@ -182,7 +184,10 @@ export function VinylPlayer({ tracks }: { tracks: Track[] }) {
           <button
             type="button"
             className="vinyl__button"
-            onClick={() => setPlaying((p) => !p)}
+            onClick={() => {
+              if (!playing) window.dispatchEvent(new Event(VINYL_ACTIVITY_EVENT));
+              setPlaying((p) => !p);
+            }}
             aria-label={playing ? "Pause" : "Lecture"}
           >
             {playing ? <PauseIcon /> : <PlayIcon />}

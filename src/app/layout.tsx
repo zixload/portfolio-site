@@ -5,6 +5,7 @@ import { SidebarVisual } from "@/components/sidebar-visual";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { SoundEffects } from "@/components/sound-effects";
 import { VinylPlayer } from "@/components/vinyl-player";
+import { DragonCompanion } from "@/components/dragon-companion";
 import { LocaleProvider } from "@/lib/locale-context";
 import { content, music, showSidebarVisual, site } from "@/lib/content";
 import "./globals.css";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </div>
             )}
           </main>
+          <DragonCompanion />
         </LocaleProvider>
       </body>
     </html>
