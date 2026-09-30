@@ -81,7 +81,7 @@ export const cards: Record<string, InlineCard> = {
     layout: "cover",
   },
   github: {
-    images: ["/icon.png"],
+    images: ["/media/author/profile.png"],
     title: "zix",
     subtitle: "@zixload",
     note: "github.com/zixload",

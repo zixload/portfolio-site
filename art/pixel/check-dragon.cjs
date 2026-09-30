@@ -156,6 +156,34 @@ async function main() {
     assert.notEqual((await read()).transform, homePosition, "Next pursuit chooses another landing spot");
     console.log("Landing: picks another spot for the next return; no flame or dust effects during flight.");
 
+    await page.mouse.move(900, 650);
+    const beforeWalk = await pet.boundingBox();
+    await page.clock.fastForward(59_000);
+    await page.clock.runFor(100);
+    assert.equal((await read()).state, "sleeping", "No walk before one minute of inactivity");
+    await page.mouse.move(901, 650);
+    await page.clock.fastForward(59_000);
+    await page.clock.runFor(100);
+    assert.equal((await read()).state, "sleeping", "Pointer activity resets the one-minute timer");
+    await page.clock.runFor(1200);
+    assert.equal((await read()).state, "walking", "One quiet minute starts a walk on the player");
+    const walkPixels = await pet.locator("canvas").evaluate(canvas => canvas.toDataURL());
+    const firstStep = await pet.boundingBox();
+    await page.clock.runFor(450);
+    assert.notEqual(await pet.locator("canvas").evaluate(canvas => canvas.toDataURL()), walkPixels, "Legs animate during the walk");
+    const nextStep = await pet.boundingBox();
+    assert.ok(Math.abs(firstStep.y - nextStep.y) <= 1 && Math.abs(firstStep.y - beforeWalk.y) <= 1, "Walking feet stay on the same platform baseline");
+    assert.ok(Math.abs(nextStep.x - firstStep.x) >= 4 && Math.abs(nextStep.x - firstStep.x) <= 10, "Walk advances gently rather than flying or sliding fast");
+    await page.screenshot({ path: path.join(__dirname, "dragon-walking-desktop.png"), animations: "disabled" });
+    await page.clock.runFor(15000);
+    assert.equal((await read()).state, "sleeping", "Walk ends in sleep");
+    const afterWalk = await pet.boundingBox();
+    assert.ok(Math.abs(afterWalk.x - beforeWalk.x) > 20, "Sleeps at a visibly different spot after walking");
+    assert.ok(afterWalk.x >= player.x && afterWalk.x + afterWalk.width <= player.x + player.width, "Walk stays on the player");
+    await page.clock.runFor(2000);
+    assert.equal((await read()).state, "sleeping", "Restarts the quiet-minute timer after a walk");
+    console.log("Walking: one quiet minute, activity resets timer, animated grounded steps, different resting spot.");
+
     await page.setViewportSize({ width: 390, height: 844 });
     await page.clock.runFor(1000);
     const box = await pet.boundingBox();
@@ -168,6 +196,9 @@ async function main() {
     assert.equal((await read()).state, "fire", "Keyboard activates the same single-click action");
     await page.clock.runFor(2500);
     assert.equal((await read()).state, "sleeping");
+    await page.clock.fastForward(65_000);
+    await page.clock.runFor(200);
+    assert.equal((await read()).state, "sleeping", "No walk when the vinyl platform is hidden on mobile");
     console.log("Mobile: visible, no overflow; keyboard wake/flames/sleep works.");
 
     await page.emulateMedia({ reducedMotion: "reduce" });

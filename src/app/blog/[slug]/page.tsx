@@ -30,7 +30,7 @@ export default async function BlogPostPage({
       {entry && (
         <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
           <Image
-            src="/icon.png"
+            src="/media/author/zixload.png"
             alt="zixload"
             width={24}
             height={24}

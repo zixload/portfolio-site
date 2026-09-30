@@ -5,12 +5,14 @@ import sprites from "@/lib/dragon-sprites.json";
 import { VINYL_ACTIVITY_EVENT } from "@/lib/companion-events";
 
 type Point = { x: number; y: number };
-type Mode = "waking" | "flying" | "landing" | "alert" | "fire" | "tired" | "sleeping" | "drowsy";
+type Mode = "waking" | "flying" | "landing" | "alert" | "fire" | "tired" | "sleeping" | "drowsy" | "walking";
 const TAU = Math.PI * 2;
 const FLAP_MS = 130;
 const TURN_MS = 105;
 const CHASE_MS = 5000;
 const SPEED = 120;
+const INACTIVE_MS = 60_000;
+const WALK_SPEED = 16;
 
 function directionToward(dx: number, dy: number) {
   return (Math.round(Math.atan2(dy, dx) / (TAU / 8)) + 8) % 8;
@@ -47,6 +49,7 @@ export function DragonCompanion() {
     let turningUntil = 0;
     let nextTurn = 0;
     let stageSince = performance.now();
+    let lastActivity = stageSince;
     let last = stageSince;
     let hiddenSince = 0;
     let animation = 0;
@@ -55,6 +58,11 @@ export function DragonCompanion() {
     let previousFrame = -1;
     let previousPosition = "";
     let recentClicks: number[] = [];
+    let platform: DOMRect | null = null;
+    let walkTargetFraction = perchFraction;
+    let walkDistance = 0;
+    let previousWalkPhase = -1;
+    const walkingFrames: HTMLCanvasElement[] = [];
 
     const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(value, Math.max(min, max)));
 
@@ -66,6 +74,7 @@ export function DragonCompanion() {
       button.style.height = `${sprites.cell * scale}px`;
       const dock = document.querySelector<HTMLElement>(".vinyl-dock .vinyl");
       const rect = dock?.getBoundingClientRect();
+      platform = rect && rect.width > 0 && width >= 1280 ? rect : null;
       if (rect && rect.width > 0 && width >= 1280) {
         perch = { x: rect.left + rect.width * perchFraction, y: rect.top + 1 };
       } else {
@@ -91,11 +100,14 @@ export function DragonCompanion() {
       mode = value;
       stageSince = now;
       previousFrame = -1;
+      if (value !== "flying" && value !== "landing" && value !== "walking") direction = 0;
       if (value !== "flying" && value !== "landing") position = { ...perch };
     };
 
     const render = (now: number) => {
       const flying = mode === "flying" || mode === "landing";
+      const walking = mode === "walking";
+      const walkPhase = Math.floor(walkDistance / scale) % 8;
       let index: number;
       if (flying) {
         index = now < turningUntil ? sprites.turn[direction]
@@ -105,18 +117,28 @@ export function DragonCompanion() {
       else if (mode === "fire") index = sprites.poses.fire[reducedMotion ? 0 : Math.floor((now - stageSince) / 160) % 2];
       else index = mode === "tired" ? sprites.poses.tired : sprites.poses.alert;
 
-      if (index !== previousFrame) {
+      if (index !== previousFrame || (walking && walkPhase !== previousWalkPhase)) {
         context.clearRect(0, 0, sprites.cell, sprites.cell);
-        context.drawImage(image, index % sprites.columns * sprites.cell, Math.floor(index / sprites.columns) * sprites.cell,
-          sprites.cell, sprites.cell, 0, 0, sprites.cell, sprites.cell);
+        if (walking) {
+          context.save();
+          if (direction === 4) { context.translate(56, 0); context.scale(-1, 1); }
+          context.drawImage(walkingFrames[walkPhase], 0, 0);
+          context.restore();
+        } else {
+          context.drawImage(image, index % sprites.columns * sprites.cell, Math.floor(index / sprites.columns) * sprites.cell,
+            sprites.cell, sprites.cell, 0, 0, sprites.cell, sprites.cell);
+        }
         if (mode === "drowsy") {
           context.fillStyle = "#FF8A1F";
           context.fillRect(40, 42, 2, 1);
         }
         previousFrame = index;
+        previousWalkPhase = walking ? walkPhase : -1;
         button.dataset.frame = String(index);
       }
-      const x = Math.round(position.x - (flying ? 32 : 28) * scale);
+      // Advance in whole sprite pixels, in sync with each planted foot.
+      const renderX = walking ? Math.round(position.x / scale) * scale : position.x;
+      const x = Math.round(renderX - (flying ? 32 : 28) * scale);
       const y = Math.round(position.y - (flying ? 36 : 52) * scale);
       const transform = `translate3d(${x}px, ${y}px, 0)`;
       if (transform !== previousPosition) { button.style.transform = transform; previousPosition = transform; }
@@ -130,6 +152,27 @@ export function DragonCompanion() {
       const dt = Math.min((now - last) / 1000, 0.06);
       last = now;
       if (!reducedMotion) {
+        if (mode === "sleeping" && platform && now - lastActivity >= INACTIVE_MS) {
+          walkTargetFraction = 0.3 + Math.random() * 0.48;
+          if (Math.abs(walkTargetFraction - perchFraction) < 0.12) {
+            walkTargetFraction = perchFraction < 0.54 ? 0.66 + Math.random() * 0.12 : 0.3 + Math.random() * 0.1;
+          }
+          direction = walkTargetFraction > perchFraction ? 0 : 4;
+          walkDistance = 0;
+          setMode("walking", now);
+        }
+        if (mode === "walking") {
+          if (!platform) { lastActivity = now; setMode("sleeping", now); }
+          else {
+            const remaining = (walkTargetFraction - perchFraction) * platform.width;
+            const step = Math.min(Math.abs(remaining), WALK_SPEED * dt);
+            perchFraction += Math.sign(remaining) * step / platform.width;
+            perch = { x: platform.left + platform.width * perchFraction, y: platform.top + 1 };
+            position = { ...perch };
+            walkDistance += step;
+            if (Math.abs(remaining) <= step) { lastActivity = now; setMode("tired", now); }
+          }
+        }
         if (mode === "flying" && now - stageSince >= CHASE_MS) {
           const previous = perchFraction;
           perchFraction = 0.54 + Math.random() * 0.24;
@@ -193,10 +236,11 @@ export function DragonCompanion() {
       if (recentClicks.length >= 3 && !reducedMotion) {
         recentClicks = [];
         takeOff(now);
-      } else if (mode === "sleeping" || mode === "drowsy" || mode === "tired" || mode === "alert") setMode("waking", now);
+      } else if (mode === "sleeping" || mode === "drowsy" || mode === "tired" || mode === "alert" || mode === "walking") setMode("waking", now);
       resume();
     };
     const onMusic = () => {
+      lastActivity = performance.now();
       if (!loaded || (mode !== "sleeping" && mode !== "drowsy")) return;
       recentClicks = [];
       setMode("drowsy", performance.now());
@@ -207,6 +251,7 @@ export function DragonCompanion() {
       else {
         const paused = performance.now() - hiddenSince;
         stageSince += paused;
+        lastActivity += paused;
         resume();
       }
     };
@@ -218,17 +263,46 @@ export function DragonCompanion() {
       resume();
     };
     const onResize = () => { measure(); if (loaded) render(performance.now()); };
-    const onPointer = (event: PointerEvent) => { pointer = { x: event.clientX, y: event.clientY }; };
+    const onActivity = () => { lastActivity = performance.now(); };
+    const onPointer = (event: PointerEvent) => { pointer = { x: event.clientX, y: event.clientY }; onActivity(); };
     const observer = new ResizeObserver(onResize);
     const dock = document.querySelector(".vinyl-dock");
     if (dock) observer.observe(dock);
     window.addEventListener("resize", onResize);
     window.addEventListener("pointermove", onPointer, { passive: true });
     window.addEventListener("pointerdown", onPointer, { passive: true });
+    window.addEventListener("keydown", onActivity);
+    window.addEventListener("wheel", onActivity, { passive: true });
+    window.addEventListener("scroll", onActivity, { passive: true });
     window.addEventListener(VINYL_ACTIVITY_EVENT, onMusic);
     document.addEventListener("visibilitychange", onVisibility);
     motion.addEventListener("change", onMotion);
-    image.onload = () => { if (!disposed) { loaded = true; resume(); } };
+    image.onload = () => {
+      if (disposed) return;
+      // Animate the folded-wing standing pose: alternating planted and swinging legs.
+      const sx = sprites.poses.alert % sprites.columns * sprites.cell;
+      const sy = Math.floor(sprites.poses.alert / sprites.columns) * sprites.cell;
+      for (let phase = 0; phase < 8; phase++) {
+        const frame = document.createElement("canvas");
+        frame.width = frame.height = sprites.cell;
+        const draw = frame.getContext("2d")!;
+        draw.imageSmoothingEnabled = false;
+        const bob = phase === 1 || phase === 5 ? 1 : 0;
+        draw.drawImage(image, sx, sy, sprites.cell, 47, 0, -bob, sprites.cell, 47);
+        for (let leg = 0; leg < 2; leg++) {
+          const planted = (phase < 4) === (leg === 0);
+          const beat = phase % 4;
+          const offset = planted ? 1 - beat : [-2, 0, 2, 1][beat];
+          const lift = planted ? 0 : [0, 1, 2, 1][beat];
+          const left = leg === 0 ? 18 : 32;
+          draw.drawImage(image, sx + left, sy + 47, 14, 5, left + offset, 47 - lift, 14, 5);
+        }
+        walkingFrames.push(frame);
+      }
+      loaded = true;
+      lastActivity = performance.now();
+      resume();
+    };
     image.src = sprites.src;
 
     return () => {
@@ -238,6 +312,9 @@ export function DragonCompanion() {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("pointerdown", onPointer);
+      window.removeEventListener("keydown", onActivity);
+      window.removeEventListener("wheel", onActivity);
+      window.removeEventListener("scroll", onActivity);
       window.removeEventListener(VINYL_ACTIVITY_EVENT, onMusic);
       document.removeEventListener("visibilitychange", onVisibility);
       motion.removeEventListener("change", onMotion);
