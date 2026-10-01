@@ -1,17 +1,16 @@
 [
   {
     "slug": "nanos-world-lua",
-    "date": "2026-09-14",
+    "date": "2026-10-01",
     "section": "journal",
     "title": {
-      "fr": "Lua côté serveur : carnet d'un serveur nanos world",
-      "en": "Lua on the Server Side: Notes from a nanos world Server"
+      "fr": "Fate’s Games : apprendre Lua en montant un serveur de jeu",
+      "en": "Fate’s Games: Learning Lua by Building a Game Server"
     },
     "description": {
-      "fr": "Notes en cours : le Lua côté serveur, la façon dont un serveur de jeu exécute les scripts, et les questions d'optimisation que je rencontre en montant mon serveur.",
-      "en": "Notes in progress: server-side Lua, how a game server actually runs scripts, and the optimization questions I keep running into while building my server."
+      "fr": "Mon serveur de mini-jeux sur nanos world : apprendre Lua, comprendre le multijoueur, travailler la map dans Unreal et tester entre amis, avec l’aide de Claude.",
+      "en": "My nanos world mini-game server: learning Lua, understanding multiplayer, working on the map in Unreal, and testing with friends, with help from Claude."
     },
-    "wip": true,
-    "image": "/media/writing/nanos-world-lua.jpg"
+    "image": "/media/writing/fate-games-cover.jpg"
   }
 ]
