@@ -1,5 +1,33 @@
 [
   {
+    "slug": "tartaglia-contre-fior",
+    "date": "2026-10-01",
+    "section": "journal",
+    "title": {
+      "fr": "Tartaglia contre Fior : trente problèmes pour un duel",
+      "en": "Tartaglia vs Fior: Thirty Problems for a Duel"
+    },
+    "description": {
+      "fr": "Un défi de trente problèmes à Venise en 1535, une méthode gardée secrète et une équation du troisième degré expliquée avec une animation de cube dans Blender.",
+      "en": "A thirty-problem challenge in Venice in 1535, a secret method, and a cubic equation explained through a Blender cube animation."
+    },
+    "image": "/media/writing/tartaglia-cover.jpg"
+  },
+  {
+    "slug": "ocr-tesseract",
+    "date": "2026-10-01",
+    "section": "journal",
+    "title": {
+      "fr": "Traduire le texte à l’écran avec Tesseract",
+      "en": "Translating On-Screen Text with Tesseract"
+    },
+    "description": {
+      "fr": "Un outil que j’ai développé il y a environ un an pour traduire du texte non sélectionnable : ma découverte de Tesseract, son histoire et la façon dont il lit une image.",
+      "en": "A tool I built about a year ago to translate non-selectable text: discovering Tesseract, its history, and how it reads an image."
+    },
+    "image": "/media/writing/ocr-cover.jpg"
+  },
+  {
     "slug": "nanos-world-lua",
     "date": "2026-10-01",
     "section": "journal",
