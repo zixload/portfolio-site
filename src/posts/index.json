@@ -15,7 +15,7 @@
   },
   {
     "slug": "ocr-tesseract",
-    "date": "2026-10-01",
+    "date": "2026-09-22",
     "section": "journal",
     "title": {
       "fr": "Traduire le texte à l’écran avec Tesseract",
@@ -29,7 +29,7 @@
   },
   {
     "slug": "nanos-world-lua",
-    "date": "2026-10-01",
+    "date": "2026-09-14",
     "section": "journal",
     "title": {
       "fr": "Fate’s Games : apprendre Lua en montant un serveur de jeu",
