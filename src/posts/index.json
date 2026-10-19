@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "fate-hub",
+    "date": "2026-10-16",
+    "section": "journal",
+    "title": {
+      "fr": "Fate Hub : un petit cube à la place de la barre des tâches",
+      "en": "Fate Hub: A Small Cube Instead of the Taskbar"
+    },
+    "description": {
+      "fr": "Mon compagnon de bureau pour Windows : un cube qui ouvre un hub, un dock et un agenda, construit avec Electron, un peu de C# et beaucoup d’essais filmés image par image.",
+      "en": "My Windows desktop companion: a cube that opens a hub, a dock and a calendar, built with Electron, a bit of C#, and a lot of frame-by-frame screen recordings."
+    },
+    "image": "/media/writing/fate-hub-cover.jpg"
+  },
+  {
+    "slug": "tartaglia-contre-fior",
+    "date": "2026-10-01",
+    "section": "journal",
+    "title": {
+      "fr": "Tartaglia contre Fior : trente problèmes pour un duel",
+      "en": "Tartaglia vs Fior: Thirty Problems for a Duel"
+    },
+    "description": {
+      "fr": "Un défi de trente problèmes à Venise en 1535, une méthode gardée secrète et une équation du troisième degré expliquée avec une animation de cube dans Blender.",
+      "en": "A thirty-problem challenge in Venice in 1535, a secret method, and a cubic equation explained through a Blender cube animation."
+    },
+    "image": "/media/writing/tartaglia-cover.jpg"
+  },
+  {
+    "slug": "ocr-tesseract",
+    "date": "2026-09-22",
+    "section": "journal",
+    "title": {
+      "fr": "Traduire le texte à l’écran avec Tesseract",
+      "en": "Translating On-Screen Text with Tesseract"
+    },
+    "description": {
+      "fr": "Un outil que j’ai développé il y a environ un an pour traduire du texte non sélectionnable : ma découverte de Tesseract, son histoire et la façon dont il lit une image.",
+      "en": "A tool I built about a year ago to translate non-selectable text: discovering Tesseract, its history, and how it reads an image."
+    },
+    "image": "/media/writing/ocr-cover.jpg"
+  },
+  {
+    "slug": "nanos-world-lua",
+    "date": "2026-09-14",
+    "section": "journal",
+    "title": {
+      "fr": "Fate’s Games : apprendre Lua en montant un serveur de jeu",
+      "en": "Fate’s Games: Learning Lua by Building a Game Server"
+    },
+    "description": {
+      "fr": "Mon serveur de mini-jeux sur nanos world : apprendre Lua, comprendre le multijoueur, travailler la map dans Unreal et tester entre amis, avec l’aide de Claude.",
+      "en": "My nanos world mini-game server: learning Lua, understanding multiplayer, working on the map in Unreal, and testing with friends, with help from Claude."
+    },
+    "image": "/media/writing/fate-games-cover.jpg"
+  }
+]

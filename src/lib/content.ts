@@ -1,0 +1,463 @@
+import { managedEntries } from "@/lib/managed-posts";
+
+// Contenu centralisé du site — à adapter au fil du temps.
+// Bilingue FR/EN : voir `content` plus bas. `site`, `links` et les chemins
+// d'images restent partagés entre les deux langues.
+
+export type Locale = "fr" | "en";
+
+export const site = {
+  name: "zix",
+};
+
+// Bascule le lien "show more" qui déplie la bio longue sous la bio courte.
+export const showLongBio = true;
+
+// Vidéo de fin de page désactivée : la source (480x624, portrait) est trop
+// petite pour la largeur actuelle. À remettre à `true` avec un rendu plus large.
+export const showSidebarVisual = false;
+
+// Réseaux affichés en bas de chaque page. `icon` choisit
+// le dessin dans site-footer.tsx.
+export const links: { label: string; href: string; icon: "github" | "x" }[] = [
+  { label: "GitHub", href: "https://github.com/zixload", icon: "github" },
+  { label: "X", href: "https://x.com/zixload", icon: "x" },
+];
+
+export type Entry = {
+  slug: string;
+  title: string;
+  date: string; // ISO
+  description: string;
+  href?: string; // lien externe optionnel (PDF, repo, etc.)
+  post?: boolean; // true = page interne /blog/{slug} (Markdown), rendu via src/posts/{slug}.md
+  image?: string; // vignette illustrant l'entrée, ex. "/media/writing/mon-post.png"
+  wip?: boolean; // article encore en cours d'écriture : affiche la pastille "writing…"
+};
+
+// Images partagées entre les deux langues.
+export const media = {
+  currentlyReadingCover: "/media/shadow-slave-cover.jpg",
+  currentlyReadingIllustration: "/media/shadow-slave-illustration.jpg",
+  combatSportsPhoto: "/media/photo_box.png",
+  lolScreens: [
+    "/media/lol-challenger-flex.png",
+    "/media/lol-master-1.png",
+    "/media/lol-master-2.png",
+    "/media/lol-master-3.png",
+    "/media/lol-master-4.png",
+  ],
+};
+
+// Carte qui s'ouvre au survol d'un mot du texte (voir RichText).
+export type InlineCard = {
+  images: string[];
+  title?: string;
+  subtitle?: string;
+  note?: string;
+  /** Par défaut : "photo" pour une image, "stack" pour plusieurs. */
+  layout?: "photo" | "stack" | "profile" | "cover";
+};
+
+// Noms propres uniquement : ils restent identiques dans les deux langues.
+export const cards: Record<string, InlineCard> = {
+  parnasse: {
+    images: [media.combatSportsPhoto],
+    title: "Salahdine Parnasse",
+    subtitle: "UFC",
+  },
+  lol: {
+    images: media.lolScreens.slice(0, 3),
+    title: "League of Legends",
+    subtitle: "Master · Challenger Flex",
+  },
+  shadowslave: {
+    images: [media.currentlyReadingCover],
+    title: "Shadow Slave",
+    subtitle: "Guiltythree",
+    layout: "cover",
+  },
+  github: {
+    images: ["/media/author/profile.png"],
+    title: "zix",
+    subtitle: "@zixload",
+    note: "github.com/zixload",
+    layout: "profile",
+  },
+};
+
+// Objets 3D qui flottent à droite d'un paragraphe (voir RichText, attribut
+// `obj:`). Rendus dans Blender par art/3d/studio.py, en mode `still`, orientés
+// de trois quarts vers le texte.
+export const objects: Record<
+  string,
+  { image: string; width: number; height: number; alt: string }
+> = {
+  weaver: {
+    image: "/media/objects/weaver.webp",
+    width: 226,
+    height: 300,
+    alt: "Masque de Weaver",
+  },
+};
+
+// Mots en gras suivis d'une petite icône unie, sombres au repos, qui prennent
+// leur couleur au survol du paragraphe (voir RichText, attribut `glow:`). Les
+// icônes sont dessinées dans rich-text.tsx.
+export const glows: Record<
+  string,
+  { icon: "trend" | "shield"; color: string }
+> = {
+  finance: { icon: "trend", color: "#4f46e5" },
+  security: { icon: "shield", color: "#2563eb" },
+};
+
+// Dossiers d'images affichés en carrousel dans les articles, avec leur nombre
+// d'images (01.webp, 02.webp…). Dans le markdown : ![légende](/dossier/).
+export const carousels: Record<string, number> = {
+  "/media/writing/soutenance/": 25,
+};
+
+// Petites images collées au mot, à hauteur de texte (voir RichText, attribut
+// `pic:`) : « cover » pour une couverture, « object » pour un
+// rendu détouré. `sway` : l'objet est suspendu et se balance.
+export const pics: Record<
+  string,
+  {
+    src: string;
+    shape: "cover" | "object";
+    sway?: boolean;
+    width?: number; // taille réelle de l'image, pour garder ses proportions
+    height?: number;
+  }
+> = {
+  shadowslave: { src: media.currentlyReadingCover, shape: "cover" },
+  gloves: {
+    src: "/media/objects/gloves.webp",
+    shape: "object",
+    sway: true,
+    width: 179,
+    height: 263,
+  },
+};
+
+// Morceaux de la platine, en bas de l'accueil. Les fichiers audio vivent dans
+// public/media/music/ ; une pochette carrée de 320px suffit pour l'étiquette.
+export const music = [
+  {
+    title: "almost gone",
+    artist: "Albert Victor",
+    cover: "/media/music/almost-gone-cover.jpg",
+    src: "/media/music/almost-gone.mp3",
+  },
+  {
+    title: "in love with life",
+    artist: "Ophelia Wilde",
+    cover: "/media/music/in-love-with-life-cover.jpg",
+    src: "/media/music/in-love-with-life.mp3",
+  },
+  {
+    title: "Echoes",
+    artist: "Olexandr Ignatov",
+    cover: "/media/music/echoes-cover.jpg",
+    src: "/media/music/echoes.mp3",
+  },
+];
+
+type LocaleContent = {
+  nav: { href: string; label: string }[];
+  bio: string[];
+  bioLong: string[]; // paragraphes ajoutés par « show more »
+  bioMoreLabel: string; // déplie la bio longue
+  bioLessLabel: string; // la referme
+  combatSportsCaption: string;
+  currentlyReading: {
+    title: string;
+    author: string;
+    label: string; // "En train de lire" / "Currently reading"
+    abstractLabel: string; // "Abstract"
+    abstract: string;
+    quote: string;
+    quoteNote: string;
+  };
+  beliefs: string[];
+  research: Entry[];
+  journal: Entry[];
+  pages: {
+    recherche: { title: string; description: string };
+    journal: { title: string; description: string };
+    convictions: { title: string };
+    notFound: { title: string; description: string; back: string };
+  };
+  blogsHeading: string;
+};
+
+export const content: Record<Locale, LocaleContent> = {
+  fr: {
+    nav: [
+      { href: "/", label: "Accueil" },
+      { href: "/recherche", label: "Recherche" },
+    ],
+    bio: [
+      "Je suis un étudiant plutôt curieux mais basique, j'apprends la [finance quantitative](glow:finance), la gestion des risques et des actifs. D'autres passions m'animent aussi : le code, les languages bas niveau, la sécurité informatique, la cryptographie et la lecture.",
+      "Le travail auquel j'aspire serait de contribuer à la recherche et au développement de stratégies quantitatives, et plus tard rejoindre une [équipe de recherche en sécurité informatique](glow:security).",
+    ],
+    bioLong: [
+      "En ce moment je lis [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree), pour sa plume : on se croirait dans la tête de Sunny. J'ai fait de la [boxe thaï](pic:gloves) pendant des années et je suis beaucoup le MMA ; [Salahdine Parnasse](card:parnasse) sera champion UFC, j'en suis sûr. Et je joue à League of Legends : [Master en solo/duo](card:lol), Challenger une fois en Flex.",
+    ],
+    bioMoreLabel: "show more",
+    bioLessLabel: "show less",
+    combatSportsCaption: "Avec Salahdine Parnasse",
+    currentlyReading: {
+      title: "Shadow Slave",
+      author: "Guiltythree",
+      label: "En train de lire",
+      abstractLabel: "Abstract",
+      abstract:
+        "Ayant grandi dans la pauvreté, Sunny attendait peu de choses de la vie. Il n'avait cependant pas prévu d'être choisi par le Sortilège du Cauchemar et de devenir un Éveillé, membre d'un groupe d'élite de personnes douées de pouvoirs surnaturels. Transporté dans un monde magique en ruine, il se retrouve confronté à de terribles monstres, et à d'autres Éveillés, dans une lutte mortelle pour la survie. Pire encore, le pouvoir divin qu'il a reçu possède un effet secondaire mineur, mais potentiellement fatal...",
+      quote:
+        "Her already prolific fame and exalted status instantly soared as high as the sun. While Nephis slept, her arrival was already creating titanic waves in the mindset of millions of people. In front of the Awakened Academy, a hundred thousand candles continued to burn despite the falling snow. ...And cast by their flames, a hundred thousand shadows danced on the ground.",
+      quoteNote: "Chapitre 766 : Making History",
+    },
+    beliefs: [
+      "Un backtest qui marche trop bien est un bug, pas un edge.",
+      "Le shrinkage simple bat souvent le modèle sophistiqué mal calibré.",
+      "Comprendre pourquoi ça casse compte plus que savoir que ça marche.",
+      "Un résultat qui contredit ton hypothèse reste un résultat.",
+      "Le risque qu'on ne mesure pas est celui qui finit par coûter cher.",
+      "Lire le papier original vaut mieux que lire le résumé qu'on t'en a fait.",
+      "Le reverse engineering, c'est de la lecture attentive avant tout.",
+      "Un CTF raté enseigne plus qu'un CTF résolu en cinq minutes.",
+      "Le code qui marche une fois ne prouve rien.",
+      "Automatiser une tâche dès qu'on la refait une troisième fois.",
+      "Le turnover coûte toujours plus cher qu'on ne l'anticipe.",
+      "On apprend davantage en cassant les choses qu'en les utilisant.",
+      "La discipline bat la motivation sur la durée.",
+      "Écrire clairement force à penser clairement.",
+      "Douter de ses propres résultats avant de les défendre.",
+    ],
+    research: [
+      ...managedEntries("fr", "research"),
+      {
+        slug: "memoire-m2-minimum-variance",
+        title:
+          "Décomposition de la covariance, prévisions de volatilité et de corrélation pour l'allocation minimum-variance",
+        date: "2026-08-14",
+        description:
+          "Mémoire de master en gestion des risques et des actifs : grille factorielle croisant deux modèles de variance (empirique, GARCH) et trois modèles de corrélation (empirique, shrinkage Ledoit-Wolf, DCC), backtestée sur 281 actions américaines (2005–2025). Le shrinkage de la corrélation réduit systématiquement le risque réalisé du portefeuille minimum-variance ; le GARCH le détériore ; le DCC n'apporte de gain robuste dans aucune configuration.",
+        post: true,
+        image: "/media/writing/memoire-m2-vagues.jpg",
+      },
+      {
+        slug: "memoire-m1-chocs-geopolitiques",
+        title:
+          "Réactions différenciées des marchés financiers aux chocs géopolitiques",
+        date: "2025-08-01",
+        description:
+          "Mémoire de master 1 en gestion des risques et des actifs : l'or, le pétrole (WTI) et les indices boursiers (S&P 500, MSCI Asie) face aux chocs géopolitiques 2017–2023, via l'indice GPR (Caldara-Iacoviello) et des modèles VAR / DCC-GARCH. L'or confirme son rôle de valeur refuge ; le pétrole réagit selon la nature du choc.",
+      },
+      {
+        slug: "memoire-m1-finance-inegalites",
+        title: "Finance et inégalité de revenu : une approche moderne",
+        date: "2024-05-01",
+        description:
+          "Mémoire de master 1 en finance d'entreprise : sur 136 pays entre 1980 et 2021, le développement financier suit une relation en U inversé avec les inégalités de revenu (indice FD du FMI), seuil de retournement autour de 0,49. Confirme l'hypothèse de Greenwood et Jovanic (1990).",
+      },
+    ],
+    journal: [
+      ...managedEntries("fr", "journal"),
+      {
+        slug: "memoire-m2-minimum-variance",
+        title: "Volatilité ou corrélation : ce qui compte vraiment pour un portefeuille minimum-variance",
+        date: "2026-10-20",
+        description:
+          "Mon mémoire de M2 en détail : le GMV, le critère d'Engle et Colacito, la décomposition D R D, GARCH, Ledoit-Wolf et DCC croisés sur 281 actions américaines, avec les démonstrations et les résultats.",
+        post: true,
+        image: "/media/writing/memoire-m2-vagues.jpg",
+      },
+      {
+        slug: "apprendre-avec-ia",
+        title: "Apprendre et s'entraîner avec l'IA",
+        date: "2026-09-30",
+        description:
+          "Mes cours et mon mémoire transformés en vidéos Manim calées phrase par phrase sur ma voix, et mes répétitions d'oral transcrites puis corrigées point par point par Claude.",
+        post: true,
+        image: "/media/writing/apprendre-avec-ia-coureur.jpg",
+      },
+      {
+        slug: "sabr-heston-spx-vix",
+        title: "Calibration of SABR and Heston Models on SPX and VIX Options",
+        date: "2026-04-10",
+        description:
+          "Projet de groupe : comparaison SABR vs Heston sur options SPX et VIX, en calibration standard et jointe. SABR domine sur SPX (RMSE 0,43 pt) mais échoue sur VIX (117 pts) ; la version jointe corrige le VIX (14,7 pts) au prix du SPX (0,89 pt). Heston joint offre le meilleur compromis global.",
+        post: true,
+        image: "/media/writing/sabr-heston-spx-vix.jpg",
+      },
+      {
+        slug: "asset-management-group-project",
+        title: "Robust GMV, Machine Learning Views & Portfolio Insurance",
+        date: "2025-12-17",
+        description:
+          "Projet de groupe : portefeuille à variance minimale robuste (Ledoit-Wolf), allocation dynamique avec vues Machine Learning (XGBoost + Black-Litterman), stratégies d'assurance de portefeuille (OBPI vs CPPI, simulations Monte Carlo).",
+        post: true,
+        image: "/media/writing/asset-management-group-project.jpg",
+      },
+    ],
+    pages: {
+      recherche: {
+        title: "Recherche",
+        description:
+          "Mémoires individuels, autour de la gestion quantitative d'actifs.",
+      },
+      journal: {
+        title: "Journal",
+        description:
+          "Ce que j'apprends au fil du temps : projets de groupe, write-ups HTB/THM, notes de lecture, sans thème fixe.",
+      },
+      convictions: { title: "Ce que je crois" },
+      notFound: {
+        title: "Le saphir a sauté.",
+        description: "Cette page n'existe pas, ou plus.",
+        back: "Retour à l'accueil",
+      },
+    },
+    blogsHeading: "Blogs",
+  },
+  en: {
+    nav: [
+      { href: "/", label: "Home" },
+      { href: "/recherche", label: "Research" },
+    ],
+    bio: [
+      "I'm a fairly curious but ordinary student, learning [quantitative finance](glow:finance), risk and asset management. A few other things keep me busy too: coding, low-level languages, cybersecurity, cryptography, and reading.",
+      "The work I'm aiming for would be contributing to research and development of quantitative strategies, and later joining a [security research team](glow:security).",
+    ],
+    bioLong: [
+      "Right now I'm reading [Shadow Slave](shadow card:shadowslave pic:shadowslave obj:weaver) (Guiltythree), for the writing: it feels like being inside Sunny's head. I did [Muay Thai](pic:gloves) for years and follow MMA closely; [Salahdine Parnasse](card:parnasse) will be UFC champion, I'm sure of it. And I play League of Legends: [Master in solo/duo](card:lol), Challenger once in Flex.",
+    ],
+    bioMoreLabel: "show more",
+    bioLessLabel: "show less",
+    combatSportsCaption: "With Salahdine Parnasse",
+    currentlyReading: {
+      title: "Shadow Slave",
+      author: "Guiltythree",
+      label: "Currently reading",
+      abstractLabel: "Abstract",
+      abstract:
+        "Growing up in poverty, Sunny didn't expect much from life. He never imagined being chosen by the Nightmare Spell and becoming an Awakened, a member of an elite group gifted with supernatural powers. Transported into a ruined magical world, he finds himself facing terrible monsters, and other Awakened, in a deadly struggle for survival. Worse still, the divine power he received comes with a minor, but potentially fatal, side effect...",
+      quote:
+        "Her already prolific fame and exalted status instantly soared as high as the sun. While Nephis slept, her arrival was already creating titanic waves in the mindset of millions of people. In front of the Awakened Academy, a hundred thousand candles continued to burn despite the falling snow. ...And cast by their flames, a hundred thousand shadows danced on the ground.",
+      quoteNote: "Chapter 766: Making History",
+    },
+    beliefs: [
+      "A backtest that works too well is a bug, not an edge.",
+      "Simple shrinkage often beats a poorly calibrated sophisticated model.",
+      "Understanding why it breaks matters more than knowing it works.",
+      "A result that contradicts your hypothesis is still a result.",
+      "The risk you don't measure is the one that ends up costing you.",
+      "Reading the original paper beats reading someone's summary of it.",
+      "Reverse engineering is, first and foremost, careful reading.",
+      "A failed CTF teaches more than one solved in five minutes.",
+      "Code that works once proves nothing.",
+      "Automate a task the third time you redo it.",
+      "Turnover always costs more than you expect.",
+      "You learn more by breaking things than by using them.",
+      "Discipline beats motivation over time.",
+      "Writing clearly forces you to think clearly.",
+      "Doubt your own results before you defend them.",
+    ],
+    research: [
+      ...managedEntries("en", "research"),
+      {
+        slug: "memoire-m2-minimum-variance",
+        title:
+          "Covariance Decomposition: Volatility and Correlation Forecasts for Minimum-Variance Allocation",
+        date: "2026-08-14",
+        description:
+          "Master's thesis in risk and asset management: a factorial grid crossing two variance models (empirical, GARCH) and three correlation models (empirical, Ledoit-Wolf shrinkage, DCC), backtested on 281 US stocks (2005–2025). Correlation shrinkage systematically reduces realized minimum-variance portfolio risk; GARCH worsens it; DCC brings no robust gain in any configuration.",
+        post: true,
+        image: "/media/writing/memoire-m2-vagues.jpg",
+      },
+      {
+        slug: "memoire-m1-chocs-geopolitiques",
+        title: "Differentiated Market Reactions to Geopolitical Shocks",
+        date: "2025-08-01",
+        description:
+          "First-year master's thesis in risk and asset management: gold, oil (WTI) and equity indices (S&P 500, MSCI Asia) facing geopolitical shocks 2017–2023, using the GPR index (Caldara-Iacoviello) and VAR / DCC-GARCH models. Gold confirms its safe-haven role; oil's reaction depends on the nature of the shock.",
+      },
+      {
+        slug: "memoire-m1-finance-inegalites",
+        title: "Finance and Income Inequality: A Modern Approach",
+        date: "2024-05-01",
+        description:
+          "First-year master's thesis in corporate finance: across 136 countries from 1980 to 2021, financial development follows an inverted-U relationship with income inequality (IMF's FD index), with a turning point around 0.49. Confirms the Greenwood and Jovanic (1990) hypothesis.",
+      },
+    ],
+    journal: [
+      ...managedEntries("en", "journal"),
+      {
+        slug: "memoire-m2-minimum-variance",
+        title: "Volatility or correlation: what really matters for a minimum-variance portfolio",
+        date: "2026-10-20",
+        description:
+          "My master's thesis in detail: the GMV portfolio, Engle and Colacito's criterion, the D R D decomposition, GARCH, Ledoit-Wolf and DCC crossed on 281 US stocks, with the proofs and the results.",
+        post: true,
+        image: "/media/writing/memoire-m2-vagues.jpg",
+      },
+      {
+        slug: "apprendre-avec-ia",
+        title: "Learning and practising with AI",
+        date: "2026-09-30",
+        description:
+          "My courses and thesis turned into Manim videos synced sentence by sentence to my voice, and my defense rehearsals transcribed, then corrected point by point by Claude.",
+        post: true,
+        image: "/media/writing/apprendre-avec-ia-coureur.jpg",
+      },
+      {
+        slug: "sabr-heston-spx-vix",
+        title: "Calibration of SABR and Heston Models on SPX and VIX Options",
+        date: "2026-04-10",
+        description:
+          "Group project: SABR vs Heston comparison on SPX and VIX options, standard and joint calibration. SABR dominates on SPX (RMSE 0.43 pt) but fails on VIX (117 pts); the joint version fixes VIX (14.7 pts) at the cost of SPX (0.89 pt). Joint Heston offers the best overall compromise.",
+        post: true,
+        image: "/media/writing/sabr-heston-spx-vix.jpg",
+      },
+      {
+        slug: "asset-management-group-project",
+        title: "Robust GMV, Machine Learning Views & Portfolio Insurance",
+        date: "2025-12-17",
+        description:
+          "Group project: robust global minimum-variance portfolio (Ledoit-Wolf), dynamic allocation with Machine Learning views (XGBoost + Black-Litterman), portfolio insurance strategies (OBPI vs CPPI, Monte Carlo simulations).",
+        post: true,
+        image: "/media/writing/asset-management-group-project.jpg",
+      },
+    ],
+    pages: {
+      recherche: {
+        title: "Research",
+        description:
+          "Personal master's theses, on quantitative asset management.",
+      },
+      journal: {
+        title: "Journal",
+        description:
+          "What I learn along the way: group projects, HTB/THM write-ups, reading notes, no fixed theme.",
+      },
+      convictions: { title: "What I Believe" },
+      notFound: {
+        title: "The needle skipped.",
+        description: "This page doesn't exist, or no longer does.",
+        back: "Back home",
+      },
+    },
+    blogsHeading: "Blogs",
+  },
+};
+
+// Retrouve la date (et le titre) d'un article Markdown à partir de son slug —
+// les articles vivent dans src/posts/, mais leurs métadonnées restent ici.
+export function findEntry(slug: string): Entry | undefined {
+  return [...content.fr.research, ...content.fr.journal].find(
+    (entry) => entry.slug === slug
+  );
+}

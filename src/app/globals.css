@@ -1,0 +1,1744 @@
+@import "tailwindcss";
+
+/* Le site est volontairement en clair, quel que soit le thème système. Les
+   classes `dark:` restent dans le code mais ne se déclenchent plus que si on
+   ajoute `.dark` sur un ancêtre — donc jamais aujourd'hui. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #18181b;
+  --muted: #71717a;
+  --accent: #2f5bff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Garde-fous Lenis : le scroll interpolé ne doit pas se battre avec le natif. */
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Soulignement qui se déploie au survol, pour les liens courts d'une ligne. */
+.hover-sweep {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-sweep:hover,
+.hover-sweep:focus-visible {
+  background-size: 100% 1px;
+}
+
+/* Le surlignage est dessiné par SlidingHighlight, qui déborde lui-même du texte :
+   la ligne n'a plus besoin de fond propre, juste de passer au-dessus de la box. */
+.entry-row {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-sweep {
+    transition: none;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+a {
+  text-underline-offset: 3px;
+}
+
+/* Sélection : un bleu délavé tiré de l'accent, jamais le bleu système. */
+::selection {
+  background: color-mix(in srgb, var(--accent) 20%, white);
+  color: var(--foreground);
+}
+
+.interactive-video-card-shell {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background: transparent;
+  perspective: 1000px;
+}
+
+.interactive-video-card {
+  --card-rotate-x: 0deg;
+  --card-rotate-y: 0deg;
+  --pixel-x: 50%;
+  --pixel-y: 50%;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 0;
+  border-radius: 24px;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  transform: rotateX(var(--card-rotate-x)) rotateY(var(--card-rotate-y))
+    translateZ(0);
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    box-shadow 320ms ease;
+  will-change: transform;
+}
+
+.interactive-video-card[data-tracking="true"] {
+  box-shadow: none;
+  transition-duration: 80ms, 240ms;
+}
+
+.interactive-video-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.interactive-video-card > video {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.interactive-video-card__pixels {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  opacity: 0;
+  image-rendering: pixelated;
+  filter: contrast(1.12) saturate(0.88);
+  -webkit-mask-image: radial-gradient(
+    circle 105px at var(--pixel-x) var(--pixel-y),
+    #000 0%,
+    #000 42%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    circle 105px at var(--pixel-x) var(--pixel-y),
+    #000 0%,
+    #000 42%,
+    transparent 78%
+  );
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.interactive-video-card[data-tracking="true"]
+  .interactive-video-card__pixels {
+  opacity: 0.96;
+}
+
+.interactive-video-card__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle 160px at var(--pixel-x) var(--pixel-y),
+    rgb(255 255 255 / 12%),
+    transparent 68%
+  );
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.interactive-video-card[data-tracking="true"] .interactive-video-card__shine {
+  opacity: 1;
+}
+
+/* Rendered through document.body: transformed content sections cannot trap it. */
+.media-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.78);
+  background: color-mix(in srgb, var(--background) 80%, transparent);
+  backdrop-filter: blur(14px) saturate(0.82);
+  -webkit-backdrop-filter: blur(14px) saturate(0.82);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.media-lightbox.is-open {
+  opacity: 1;
+}
+
+.media-lightbox__image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(92vw, 1280px);
+  max-height: calc(100dvh - 6rem);
+  object-fit: contain;
+  border-radius: 0.2rem;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 0.16);
+  opacity: 0;
+  transform: translateY(14px) scale(0.965);
+  transition:
+    opacity 260ms ease,
+    transform 440ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.media-lightbox.is-open .media-lightbox__image {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.media-lightbox__close {
+  position: fixed;
+  top: clamp(0.8rem, 2vw, 1.4rem);
+  right: clamp(0.8rem, 2vw, 1.4rem);
+  z-index: 2;
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--foreground) 14%, transparent);
+  border-radius: 999px;
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.86);
+  transition:
+    opacity 220ms ease 80ms,
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 180ms ease;
+}
+
+.media-lightbox.is-open .media-lightbox__close {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.media-lightbox__close:hover {
+  background: var(--background);
+}
+
+.media-lightbox__controls {
+  position: fixed;
+  bottom: clamp(0.8rem, 2vw, 1.4rem);
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  border-radius: 999px;
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  font-size: 0.76rem;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition:
+    opacity 220ms ease 100ms,
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1) 80ms;
+}
+
+.media-lightbox.is-open .media-lightbox__controls {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.media-lightbox__controls button {
+  padding: 0.15rem 0.3rem;
+  color: inherit;
+  cursor: pointer;
+}
+
+.shadow-book-teaser {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 190px;
+}
+
+/* Posé à droite d'un paragraphe : tout est réduit, mais la flèche reste à côté
+   de la couverture — elle est dessinée pour pointer vers elle, la passer
+   dessous la ferait montrer le vide. */
+.shadow-book-teaser--compact {
+  min-height: 0;
+  gap: 0.1rem;
+}
+
+.shadow-book-teaser--compact .shadow-book-teaser__cover {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 128px;
+}
+
+.shadow-book-teaser--compact .shadow-book-teaser__note {
+  width: 92px;
+  margin-top: 0.2rem;
+}
+
+.shadow-book-teaser--compact .shadow-book-teaser__note span {
+  margin-left: 1.6rem;
+  font-size: 0.78rem;
+}
+
+.shadow-book-teaser--compact .shadow-book-teaser__note svg {
+  width: 80px;
+  height: 46px;
+}
+
+.shadow-book-teaser__cover {
+  position: relative;
+  flex: 0 0 138px;
+  width: 138px;
+  height: 184px;
+  overflow: hidden;
+  border-radius: 3px 7px 7px 3px;
+  background: #080808;
+  box-shadow:
+    -3px 4px 12px rgb(0 0 0 / 20%),
+    inset 4px 0 6px rgb(255 255 255 / 9%);
+  perspective: 700px;
+  transform: rotate(-1.4deg);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.shadow-book-teaser__cover::after {
+  position: absolute;
+  inset: 0 auto 0 8px;
+  width: 1px;
+  content: "";
+  background: rgb(255 255 255 / 20%);
+  box-shadow: 3px 0 5px rgb(0 0 0 / 45%);
+}
+
+.shadow-book-teaser__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shadow-book-teaser__cover:hover,
+.shadow-book-teaser__cover:focus-visible {
+  transform: translateY(-3px) rotateY(-7deg) rotateZ(0.4deg);
+  box-shadow: -7px 10px 20px rgb(0 0 0 / 28%);
+}
+
+.shadow-book-teaser__note {
+  align-self: flex-start;
+  width: 132px;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  transform: rotate(-5deg);
+}
+
+.shadow-book-teaser__note span {
+  display: block;
+  margin-left: 2.6rem;
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: 1rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.shadow-book-teaser__note svg {
+  display: block;
+  width: 116px;
+  height: 68px;
+  overflow: visible;
+}
+
+.shadow-book-teaser__note path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shadow-book-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 4rem 2rem 2rem;
+  overflow: hidden;
+  background: rgb(4 4 6 / 82%);
+  backdrop-filter: blur(18px) saturate(70%);
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+
+.shadow-book-dialog.is-open {
+  opacity: 1;
+}
+
+.shadow-book-dialog__close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  z-index: 5;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 999px;
+  color: #d4d4d8;
+  background: rgb(20 20 24 / 72%);
+  font: 500 0.7rem/1 var(--font-jetbrains), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.shadow-book-dialog__close:hover,
+.shadow-book-dialog__close:focus-visible {
+  border-color: rgb(255 255 255 / 40%);
+  color: #fff;
+}
+
+.shadow-book-stage {
+  position: relative;
+  width: min(88vw, 840px);
+  perspective: 1800px;
+}
+
+.shadow-book {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.54;
+  max-height: 74vh;
+  transform: translateX(-24%) scale(0.78);
+  transform-style: preserve-3d;
+  transition: transform 700ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.shadow-book-dialog.is-open .shadow-book {
+  transform: translateX(0) scale(1);
+}
+
+.shadow-book__page,
+.shadow-book__leaf,
+.shadow-book__cover {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+}
+
+.shadow-book__page,
+.shadow-book__leaf-face,
+.shadow-book__cover-back {
+  color: #28241f;
+  background:
+    linear-gradient(90deg, rgb(75 62 47 / 13%), transparent 8%),
+    radial-gradient(circle at 80% 15%, rgb(255 255 255 / 70%), transparent 28%),
+    #e9e1d1;
+}
+
+.shadow-book__page--right {
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 3.2vw, 2.75rem);
+  overflow: auto;
+  border-radius: 0 9px 9px 0;
+  box-shadow:
+    12px 18px 38px rgb(0 0 0 / 38%),
+    inset 12px 0 20px rgb(70 54 37 / 11%);
+  scrollbar-width: none;
+}
+
+.shadow-book__page--right::-webkit-scrollbar,
+.shadow-book__cover-back::-webkit-scrollbar,
+.shadow-book__leaf-face::-webkit-scrollbar {
+  display: none;
+}
+
+.shadow-book__page--blank::after {
+  position: absolute;
+  inset: 8% 8% 8% 12%;
+  border: 1px solid rgb(83 70 55 / 7%);
+  content: "";
+}
+
+.shadow-book__leaf {
+  transform-origin: 0 50%;
+  transform-style: preserve-3d;
+  transition: transform 760ms cubic-bezier(0.18, 0.76, 0.16, 1);
+  will-change: transform;
+}
+
+.shadow-book__leaf.is-dragging {
+  transition: none;
+}
+
+.shadow-book__leaf-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1rem, 2.6vw, 2.25rem);
+  overflow-y: auto;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  scrollbar-width: none;
+}
+
+.shadow-book__leaf-front {
+  border-radius: 0 9px 9px 0;
+  box-shadow:
+    12px 18px 38px rgb(0 0 0 / 30%),
+    inset 12px 0 20px rgb(70 54 37 / 11%);
+}
+
+.shadow-book__leaf-back {
+  border-radius: 9px 0 0 9px;
+  box-shadow:
+    -12px 18px 38px rgb(0 0 0 / 30%),
+    inset -12px 0 20px rgb(70 54 37 / 11%);
+  transform: rotateY(180deg);
+}
+
+.shadow-book__leaf-front::after,
+.shadow-book__leaf-back::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+}
+
+.shadow-book__leaf-front::after {
+  background: linear-gradient(90deg, rgb(39 29 18 / 12%), transparent 18%);
+}
+
+.shadow-book__leaf-back::after {
+  background: linear-gradient(270deg, rgb(39 29 18 / 12%), transparent 18%);
+}
+
+.shadow-book__cover {
+  z-index: 50;
+  transform-origin: 0 50%;
+  transform-style: preserve-3d;
+  transition:
+    transform 920ms cubic-bezier(0.16, 0.78, 0.18, 1) 100ms,
+    z-index 0s linear 0s;
+}
+
+.shadow-book-dialog.is-open .shadow-book__cover {
+  z-index: 1;
+  transform: rotateY(-179deg);
+  transition:
+    transform 920ms cubic-bezier(0.16, 0.78, 0.18, 1) 100ms,
+    z-index 0s linear 1020ms;
+}
+
+.shadow-book__cover-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 3px 9px 9px 3px;
+  backface-visibility: hidden;
+}
+
+.shadow-book__cover-front {
+  z-index: 2;
+  background: #080808;
+  box-shadow: 12px 18px 38px rgb(0 0 0 / 46%);
+}
+
+.shadow-book__cover-front img {
+  object-fit: cover;
+}
+
+.shadow-book__spine {
+  position: absolute;
+  inset: 0 auto 0 3.5%;
+  width: 2.2%;
+  background: rgb(255 255 255 / 14%);
+  box-shadow: 5px 0 10px rgb(0 0 0 / 42%);
+}
+
+.shadow-book__cover-back {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.55rem, 1.2vw, 1rem);
+  padding: clamp(1rem, 2.6vw, 2.25rem);
+  overflow-y: auto;
+  border-radius: 9px 0 0 9px;
+  transform: rotateY(180deg);
+  box-shadow:
+    -12px 18px 38px rgb(0 0 0 / 38%),
+    inset -12px 0 20px rgb(70 54 37 / 11%);
+  scrollbar-width: none;
+}
+
+.shadow-book__page-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  animation: bookPageIn 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.shadow-book__eyebrow {
+  color: #82786c;
+  font: 600 clamp(0.5rem, 1vw, 0.66rem)/1 var(--font-jetbrains), monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.shadow-book__page-content h2 {
+  margin-top: 0.55rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.45rem, 4vw, 3rem);
+  line-height: 0.95;
+}
+
+.shadow-book__author {
+  margin-top: 0.4rem;
+  color: #766e64;
+  font: 500 clamp(0.62rem, 1.1vw, 0.78rem)/1.2 var(--font-jetbrains), monospace;
+}
+
+.shadow-book__rule {
+  width: 3.5rem;
+  height: 1px;
+  margin: clamp(0.8rem, 2vw, 1.6rem) 0;
+  background: #8d8173;
+}
+
+.shadow-book__page-content h3 {
+  margin-bottom: 0.5rem;
+  font: 600 clamp(0.6rem, 1.1vw, 0.72rem)/1 var(--font-jetbrains), monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.shadow-book__abstract {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.72rem, 1.35vw, 0.92rem);
+  line-height: 1.55;
+}
+
+.shadow-book__page-content--quote {
+  justify-content: flex-start;
+}
+
+.shadow-book__quote {
+  position: relative;
+  margin-top: clamp(0.8rem, 2vw, 1.45rem);
+  padding-left: clamp(0.8rem, 1.8vw, 1.25rem);
+  border-left: 1px solid rgb(83 70 55 / 34%);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.68rem, 1.2vw, 0.88rem);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.shadow-book__quote::before {
+  position: absolute;
+  top: -0.55rem;
+  left: 0.35rem;
+  color: rgb(72 59 44 / 22%);
+  content: "“";
+  font: 3.2rem/1 Georgia, "Times New Roman", serif;
+  transform: translateX(-100%);
+}
+
+.shadow-book__quote p + p {
+  margin-top: 0.55rem;
+}
+
+.shadow-book__attribution {
+  margin-top: clamp(0.75rem, 1.8vw, 1.25rem);
+  color: #736b61;
+  font: 500 clamp(0.52rem, 0.92vw, 0.66rem)/1.45 var(--font-jetbrains), monospace;
+}
+
+.shadow-book__page-art {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  border: 1px solid rgb(56 48 40 / 13%);
+  background: #d8d2c8;
+  filter: grayscale(0.18) sepia(0.12) contrast(0.94);
+}
+
+.shadow-book__page-art img {
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+.shadow-book__page-art-gallery {
+  display: grid;
+  width: 92%;
+  margin-top: auto;
+  align-self: center;
+  gap: clamp(0.3rem, 0.7vw, 0.5rem);
+}
+
+.shadow-book__page-art-gallery .shadow-book__page-art {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  aspect-ratio: 4.8 / 1;
+}
+
+.shadow-book__page-art-gallery .shadow-book__page-art:nth-child(2) {
+  aspect-ratio: 3.8 / 1;
+  transform: rotate(0.7deg);
+}
+
+.shadow-book__page-art--opening {
+  width: 100%;
+  height: 26%;
+  min-height: 82px;
+  margin: 0 0 clamp(0.65rem, 1.4vw, 1rem);
+  transform: rotate(-0.6deg);
+}
+
+.shadow-book__page-art--opening img {
+  object-position: center 58%;
+}
+
+.shadow-book__page-art--portrait {
+  width: 43%;
+  height: 35%;
+  min-height: 90px;
+  margin-top: auto;
+  margin-right: 3%;
+  align-self: flex-end;
+  transform: rotate(1.2deg);
+}
+
+.shadow-book__page-art--portrait img {
+  object-position: center 30%;
+}
+
+.shadow-book__page-art--wide {
+  width: 88%;
+  height: 23%;
+  min-height: 72px;
+  margin-top: auto;
+  align-self: center;
+  transform: rotate(-0.8deg);
+}
+
+.shadow-book__page-art--rider {
+  width: 42%;
+  height: 31%;
+  min-height: 82px;
+  margin-top: auto;
+  margin-left: 4%;
+  align-self: flex-start;
+  transform: rotate(-1.1deg);
+}
+
+.shadow-book__page-art--rider img {
+  object-position: center 42%;
+}
+
+.shadow-book__folio {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  color: #978d80;
+  font: 500 0.58rem/1 var(--font-jetbrains), monospace;
+  letter-spacing: 0.12em;
+}
+
+.shadow-book__page--right .shadow-book__folio {
+  align-self: flex-end;
+}
+
+.shadow-book__leaf-front .shadow-book__folio {
+  align-self: flex-end;
+}
+
+.shadow-book__drag-hint {
+  position: absolute;
+  top: calc(100% + 1.35rem);
+  left: 0;
+  color: rgb(212 212 216 / 58%);
+  font: 500 0.58rem/1 var(--font-jetbrains), monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.shadow-book__pager {
+  position: absolute;
+  top: calc(100% + 1rem);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 999px;
+  color: #d4d4d8;
+  background: rgb(20 20 24 / 72%);
+  font: 500 0.64rem/1 var(--font-jetbrains), monospace;
+  transform: translateX(-50%);
+}
+
+.shadow-book__pager button {
+  padding: 0.15rem 0.3rem;
+  cursor: pointer;
+  transition: color 160ms ease, opacity 160ms ease;
+}
+
+.shadow-book__pager button:hover:not(:disabled),
+.shadow-book__pager button:focus-visible:not(:disabled) {
+  color: #fff;
+}
+
+.shadow-book__pager button:disabled {
+  cursor: default;
+  opacity: 0.25;
+}
+
+@media (max-width: 600px) {
+  .shadow-book-teaser {
+    flex-direction: row;
+  }
+
+  .shadow-book-dialog {
+    padding: 3.75rem 0.65rem 1rem;
+  }
+
+  .shadow-book-stage {
+    width: 96vw;
+  }
+
+  .shadow-book {
+    aspect-ratio: 1.28;
+  }
+
+  .shadow-book__cover-back,
+  .shadow-book__page--right,
+  .shadow-book__leaf-face {
+    padding: 0.8rem;
+  }
+
+  .shadow-book__quote {
+    font-size: clamp(0.58rem, 2.1vw, 0.72rem);
+    line-height: 1.42;
+  }
+
+  .shadow-book__page-art--portrait,
+  .shadow-book__page-art--rider {
+    height: 29%;
+  }
+
+  .shadow-book__drag-hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shadow-book,
+  .shadow-book__leaf,
+  .shadow-book__cover,
+  .shadow-book-dialog {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bookPageIn {
+  from {
+    opacity: 0.2;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ambientDrift {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  20% {
+    transform: scale(1.05) translate(-1.5%, 1%);
+  }
+  45% {
+    transform: scale(1.09) translate(1.5%, -1%);
+  }
+  70% {
+    transform: scale(1.05) translate(1%, 1.5%);
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+@keyframes petalDrift {
+  0% {
+    opacity: 0;
+    transform: translate(var(--px0), var(--py0)) rotate(var(--pr0))
+      scale(0.5);
+  }
+  12% {
+    opacity: var(--po);
+  }
+  78% {
+    opacity: var(--po);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--px1), var(--py1)) rotate(var(--pr1)) scale(1);
+  }
+}
+
+.petal {
+  position: absolute;
+  border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 214, 232, 0.55) 55%,
+    rgba(255, 214, 232, 0) 100%
+  );
+  filter: blur(0.5px);
+  pointer-events: none;
+  animation-name: petalDrift;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* ------------------------------------------------------------------------
+   Platine vinyle
+   Géométrie : disque de 164px centré en (140, 130) dans une platine de
+   240x230. L'axe du bras est en haut à gauche, à (47, 36) : au repos le bras
+   passe au-dessus du disque, en lecture il pivote de 21° et sa pointe se pose
+   sur les sillons, entre l'étiquette et le bord.
+   ------------------------------------------------------------------------ */
+/* Taille fixe : la carte ne bouge pas d'un pixel quand le morceau change,
+   quelle que soit la longueur du titre. */
+.vinyl {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1.75rem;
+  width: 504px;
+  padding: 1.25rem 2.5rem 1.25rem 1rem;
+  border-radius: 28px;
+  background: #f2f2f2;
+}
+
+.vinyl__deck {
+  position: relative;
+  flex: none;
+  width: 240px;
+  height: 230px;
+}
+
+/* Ombre portée séparée du disque : une box-shadow sur un élément qui tourne
+   tournerait avec lui, et l'ombre partirait dans tous les sens. */
+.vinyl__shadow {
+  position: absolute;
+  left: 58px;
+  top: 48px;
+  width: 164px;
+  height: 164px;
+  border-radius: 50%;
+  box-shadow:
+    0 14px 28px rgb(0 0 0 / 12%),
+    0 2px 5px rgb(0 0 0 / 7%);
+}
+
+.vinyl__disc {
+  position: absolute;
+  left: 58px;
+  top: 48px;
+  z-index: 1;
+  display: grid;
+  width: 164px;
+  height: 164px;
+  place-items: center;
+  border-radius: 50%;
+  /* Sillons très serrés à faible contraste. La période de 1,5px n'est pas un
+     multiple du pixel : elle produit volontairement ce moiré ondulé, presque
+     aquatique, qui fait la matière du disque de référence. Par-dessus, le
+     sillon de fin de face et le rebord lisse. */
+  background:
+    radial-gradient(
+      circle closest-side,
+      transparent 0 64%,
+      rgb(0 0 0 / 4%) 64.6% 65.6%,
+      transparent 66.2%
+    ),
+    radial-gradient(
+      circle closest-side,
+      transparent 0 95.5%,
+      #ececec 96.5% 100%
+    ),
+    repeating-radial-gradient(circle, #f7f7f7 0 0.75px, #e4e4e4 0.75px 1.5px);
+  will-change: transform;
+}
+
+/* Anneau clair entre les sillons et l'étiquette. */
+.vinyl__ring {
+  display: grid;
+  width: 98px;
+  height: 98px;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fdfdfd, #eeeeee 70%, #e4e4e4);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 4%),
+    inset 0 2px 4px rgb(255 255 255 / 80%);
+}
+
+.vinyl__label {
+  width: 78px;
+  height: 78px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 10%);
+}
+
+.vinyl__cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: vinylLabelIn 420ms ease both;
+}
+
+/* Reflet fixe : deux bandes claires et deux ombrées en opposition, comme la
+   lumière d'une lampe sur un disque. Masqué sur l'étiquette, sinon il
+   délaverait la pochette. */
+.vinyl__sheen {
+  position: absolute;
+  left: 58px;
+  top: 48px;
+  z-index: 2;
+  width: 164px;
+  height: 164px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 200deg,
+    rgb(255 255 255 / 0%) 0deg,
+    rgb(255 255 255 / 85%) 25deg,
+    rgb(255 255 255 / 0%) 55deg,
+    rgb(0 0 0 / 4.5%) 95deg,
+    rgb(0 0 0 / 0%) 140deg,
+    rgb(255 255 255 / 0%) 180deg,
+    rgb(255 255 255 / 85%) 205deg,
+    rgb(255 255 255 / 0%) 235deg,
+    rgb(0 0 0 / 4.5%) 275deg,
+    rgb(0 0 0 / 0%) 320deg
+  );
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 48%, #000 49%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 48%, #000 49%);
+  pointer-events: none;
+}
+
+
+/* Bras : 36px de contrepoids à gauche de l'axe, 158px jusqu'à la pointe. */
+.vinyl__arm {
+  position: absolute;
+  left: 11px;
+  top: 34px;
+  z-index: 4;
+  width: 194px;
+  height: 4px;
+  transform-origin: 36px 50%;
+  transform: rotate(0deg);
+  transition: transform 800ms cubic-bezier(0.35, 0.7, 0.25, 1);
+}
+
+/* Le bras descend une fraction de seconde après le démarrage du plateau. */
+.vinyl[data-playing="true"] .vinyl__arm {
+  transform: rotate(21deg);
+  transition-delay: 160ms;
+}
+
+.vinyl__bar {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ececec 0%, #bdbdbd 45%, #8d8d8d 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%);
+  filter: drop-shadow(0 3px 2px rgb(0 0 0 / 18%));
+}
+
+.vinyl__knob {
+  position: absolute;
+  left: 23px;
+  top: -11px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgb(0 0 0 / 7%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f1f1 45%, #d6d6d6 100%);
+  box-shadow:
+    0 2px 6px rgb(0 0 0 / 14%),
+    inset 0 1px 1px #fff;
+}
+
+.vinyl__knob::after {
+  position: absolute;
+  inset: 5px;
+  content: "";
+  border-radius: 50%;
+  background: radial-gradient(circle at 60% 65%, #f7f7f7, #e2e2e2);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
+}
+
+.vinyl__info {
+  display: flex;
+  flex: none;
+  width: 180px;
+  flex-direction: column;
+}
+
+.vinyl__eyebrow {
+  color: #3a3a3a;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Le titre réserve toujours deux lignes : long, il passe à la ligne sans
+   changer la hauteur ; au-delà, il est coupé par des points de suspension. */
+.vinyl__title {
+  display: -webkit-box;
+  height: calc(2 * 1.08em);
+  margin-top: 2px;
+  overflow: hidden;
+  color: #111;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.vinyl__artist {
+  margin-top: 4px;
+  overflow: hidden;
+  color: #9b9b9b;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vinyl__controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.vinyl__button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgb(0 0 0 / 5%);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f8f8f8, #ececec);
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 6%),
+    0 4px 10px rgb(0 0 0 / 7%),
+    inset 0 1px 0 #fff;
+  color: #111;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.vinyl__button svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+}
+
+.vinyl__button:hover {
+  transform: translateY(-1px);
+}
+
+.vinyl__button:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 1px 3px rgb(0 0 0 / 12%),
+    0 1px 1px rgb(0 0 0 / 4%);
+}
+
+.vinyl__button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes vinylLabelIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl__arm {
+    transition: none;
+  }
+}
+
+/* Place de la platine : au centre de la marge gauche, qui mesure la moitié de
+   ce qui reste une fois la colonne de 42rem retirée — son centre est donc au
+   quart. Un peu au-dessus du milieu de l'écran, loin des bords. */
+.vinyl-dock {
+  position: fixed;
+  top: 36vh;
+  left: calc((100vw - 42rem) / 4);
+  z-index: 30;
+  transform: translate(-50%, -50%);
+}
+
+/* La taille suit la largeur de la marge disponible. */
+.vinyl-dock__scale {
+  zoom: 0.55;
+}
+
+@media (min-width: 1536px) {
+  .vinyl-dock__scale {
+    zoom: 0.7;
+  }
+}
+
+@media (min-width: 1800px) {
+  .vinyl-dock__scale {
+    zoom: 0.8;
+  }
+}
+
+/* ------------------------------------------------------------------------
+   Décoration du texte (voir RichText)
+   ------------------------------------------------------------------------ */
+
+/* Trait de surligneur : une forme au bord irrégulier, comme un vrai feutre,
+   plutôt qu'un rectangle. Il se déroule une fois, de gauche à droite, quand
+   le mot arrive à l'écran. `clone` redessine le trait sur chaque ligne si le
+   mot est coupé en fin de ligne. */
+.marker {
+  margin: 0 -0.14em;
+  padding: 0 0.14em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 24' preserveAspectRatio='none'%3E%3Cpath d='M3 8C38 3 88 6 138 3s52 2 59 4l-2 12c-45 3-96 0-136 3S13 20 5 18Z' fill='%232f5bff' fill-opacity='0.2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 62%;
+  background-size: 0% 78%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 900ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.marker[data-drawn="true"] {
+  background-size: 100% 78%;
+}
+
+/* Mot qui ouvre une carte : soulignement pointillé discret, comme une note. */
+.inline-card__trigger {
+  cursor: default;
+  outline: none;
+  text-decoration: underline dotted;
+  text-decoration-color: #b4b4bb;
+  text-underline-offset: 4px;
+  transition: color 200ms ease;
+}
+
+.inline-card:hover .inline-card__trigger,
+.inline-card__trigger:focus-visible {
+  color: var(--accent);
+}
+
+.inline-card__panel {
+  opacity: 0;
+  transform: translateY(6px) scale(0.97);
+  transform-origin: 50% 100%;
+  transition:
+    opacity 180ms ease,
+    transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.inline-card:hover .inline-card__panel,
+.inline-card:focus-within .inline-card__panel {
+  opacity: 1;
+  transform: none;
+}
+
+/* « Shadow Slave » : au survol, le mot projette une longue ombre en diagonale
+   et le reste du paragraphe s'efface un peu — l'ombre, c'est le sujet du
+   livre. */
+.shadow-word {
+  transition:
+    text-shadow 500ms ease,
+    color 300ms ease;
+}
+
+.shadow-word:hover,
+.shadow-word:focus-visible {
+  color: #111 !important;
+  text-shadow:
+    1px 1px 0 rgb(0 0 0 / 15%),
+    2px 2px 0 rgb(0 0 0 / 13%),
+    3px 3px 0 rgb(0 0 0 / 11%),
+    4px 4px 0 rgb(0 0 0 / 9%),
+    5px 5px 0 rgb(0 0 0 / 7%),
+    6px 6px 0 rgb(0 0 0 / 5%),
+    7px 7px 0 rgb(0 0 0 / 3.5%),
+    8px 8px 0 rgb(0 0 0 / 2%);
+}
+
+p:has(.shadow-word) {
+  transition: color 400ms ease;
+}
+
+p:has(.shadow-word:hover),
+p:has(.shadow-word:focus-visible) {
+  color: #a1a1aa;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker {
+    background-size: 100% 78%;
+    transition: none;
+  }
+
+  .inline-card__panel,
+  .shadow-word,
+  p:has(.shadow-word) {
+    transition: none;
+  }
+}
+
+/* Objet 3D qui flotte à droite du paragraphe. Lévitation lente plutôt que
+   rotation : l'objet reste orienté vers le texte, et son ombre au sol se
+   resserre et pâlit quand il monte, ce qui vend l'impression de flotter. */
+.floating {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 1.5rem);
+  /* Largeur fixée : sans elle, la boîte absolue collée au bord droit se
+     rétrécit et l'image avec. */
+  width: 4.75rem;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Il faut de la place à droite du paragraphe : en dessous, on n'affiche rien
+   plutôt que de le faire chevaucher le texte ou déborder de l'écran. */
+@media (min-width: 1280px) {
+  .floating {
+    display: flex;
+  }
+}
+
+.floating__body {
+  display: block;
+  animation: floatBody 6s ease-in-out infinite;
+}
+
+.floating__image {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+}
+
+.floating__shadow {
+  display: block;
+  width: 3rem;
+  height: 0.5rem;
+  margin-top: 0.75rem;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(24 24 27 / 30%), transparent);
+  animation: floatShadow 6s ease-in-out infinite;
+}
+
+@keyframes floatBody {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-13px) rotate(1.5deg);
+  }
+}
+
+@keyframes floatShadow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.62);
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating__body,
+  .floating__shadow,
+  .pic--sway .pic__image {
+    animation: none;
+  }
+}
+
+/* Petites images collées au mot, à hauteur de texte : un visage rond, une
+   couverture, ou un objet détouré. */
+.pic {
+  display: inline-block;
+  margin-right: 0.3em;
+  line-height: 0;
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pic__image {
+  display: block;
+}
+
+.pic--cover {
+  vertical-align: -0.34em;
+  transform: rotate(-4deg);
+}
+
+.pic--cover .pic__image {
+  width: 0.95em;
+  height: 1.4em;
+  border-radius: 2px;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 22%);
+}
+
+.pic--object {
+  vertical-align: -0.5em;
+}
+
+.pic--object .pic__image {
+  width: auto;
+  height: 1.75em;
+}
+
+/* Suspendu : il se balance autour de son point d'accroche, en haut. */
+.pic--sway .pic__image {
+  transform-origin: 50% 0;
+  animation: hangSway 4.5s ease-in-out infinite;
+}
+
+@keyframes hangSway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+/* Au survol du mot, l'image se redresse et grossit un peu. */
+.deco:hover .pic,
+.deco:focus-within .pic {
+  transform: scale(1.18) rotate(0deg);
+}
+
+/* Mot en gras et son icône : sombres au repos, ils prennent leur couleur quand
+   on survole le paragraphe, comme une enseigne qu'on allume. */
+.glow {
+  font-weight: 600;
+  color: var(--foreground);
+  transition:
+    color 450ms ease,
+    text-shadow 450ms ease;
+}
+
+.glow__icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-left: 0.3em;
+  vertical-align: -0.12em;
+  transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+p:hover .glow {
+  color: var(--glow);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--glow) 35%, transparent);
+}
+
+p:hover .glow__icon {
+  transform: rotate(-8deg) scale(1.15);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--glow) 45%, transparent));
+}
+
+/* 404 : le zéro est un disque, mêmes sillons que la platine. Il tourne, puis
+   recule d'un coup de temps en temps, comme un saphir qui saute. */
+.disc404 {
+  position: relative;
+  display: inline-block;
+  width: 0.72em;
+  height: 0.72em;
+  margin: 0 0.04em;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle,
+    #f7f7f7 0 0.75px,
+    #e4e4e4 0.75px 1.5px
+  );
+  box-shadow:
+    0 10px 24px rgb(0 0 0 / 14%),
+    inset 0 0 0 1px rgb(0 0 0 / 5%);
+  animation: disc404Skip 5s linear infinite;
+}
+
+.disc404__label {
+  position: absolute;
+  inset: 32%;
+  border-radius: 50%;
+  background: conic-gradient(from 20deg, #18181b 0 70%, #3f3f46 70% 78%, #18181b 78%);
+}
+
+.disc404__label::after {
+  content: "";
+  position: absolute;
+  inset: 42%;
+  border-radius: 50%;
+  background: #f4f4f5;
+}
+
+@keyframes disc404Skip {
+  0% {
+    transform: rotate(0deg);
+  }
+  70% {
+    transform: rotate(504deg);
+  }
+  72% {
+    transform: rotate(470deg);
+  }
+  100% {
+    transform: rotate(720deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc404 {
+    animation: none;
+  }
+}
+
+/* Carrousel de diapositives dans les articles. */
+.slide-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  outline: none;
+}
+
+.slide-carousel__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 6%);
+}
+
+.slide-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide-carousel__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  aspect-ratio: 1399 / 875;
+  scroll-snap-align: start;
+  background: #fff;
+}
+
+.slide-carousel__bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.slide-carousel__count {
+  min-width: 3.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: #71717a;
+}
+
+.slide-carousel__button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 12%),
+    inset 0 0 0 1px rgb(0 0 0 / 5%);
+  color: #3f3f46;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+.slide-carousel__button:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+.slide-carousel__button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.slide-carousel__button svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.slide-carousel:focus-visible .slide-carousel__track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Bas de page : les réseaux, centrés, discrets. */
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 2rem 1.5rem 3.5rem;
+}
+
+.site-footer__links {
+  display: flex;
+  gap: 1.1rem;
+}
+
+.site-footer__link {
+  display: block;
+  color: #a1a1aa;
+  transition:
+    color 200ms ease,
+    transform 200ms ease;
+}
+
+.site-footer__link:hover,
+.site-footer__link:focus-visible {
+  color: #27272a;
+  transform: translateY(-2px);
+}
+
+/* Liste des blogs : au survol d'un article, les autres se floutent et
+   s'estompent, pour que celui visé ressorte (repris de ramx.in). */
+.blog-focus__item {
+  transition:
+    filter 300ms ease,
+    opacity 300ms ease;
+}
+
+.blog-focus:has(.blog-focus__item:hover) .blog-focus__item:not(:hover) {
+  filter: blur(2px);
+  opacity: 0.4;
+}
+
+/* The dragon shares the persistent layout with the record player. */
+.dragon-companion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 35;
+  width: 128px;
+  height: 128px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+
+.dragon-companion canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.dragon-companion[data-state="flying"],
+.dragon-companion[data-state="landing"] {
+  pointer-events: none;
+}
+
+.dragon-companion:focus-visible {
+  outline: 1px dashed #7894b4;
+  outline-offset: -15px;
+  border-radius: 50%;
+}
